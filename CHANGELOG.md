@@ -1,5 +1,5 @@
 
-# Release Notes for sidebar-markdown-notes
+# Release Notes for mdpad
 
 ## not-yet-published
 
@@ -7,7 +7,7 @@
 
 ## 1.0.4
 
-- Added the `sidebar-markdown-notes.leftMargin` setting
+- Added the `mdpad.leftMargin` setting
 - Changed background color from `--vscode-editor-background` to `--vscode-sideBar-background`
 - Added the extension to [Open VSX Registry](https://open-vsx.org/)
 

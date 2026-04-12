@@ -4,8 +4,8 @@ import * as vscode from 'vscode';
 
 import { getConfig } from './config';
 
-export default class SidebarMarkdownNotesProvider implements vscode.WebviewViewProvider {
-  public static readonly viewId = 'sidebarMarkdownNotes.webview';
+export default class MdpadProvider implements vscode.WebviewViewProvider {
+  public static readonly viewId = 'mdpad.webview';
 
   private _view?: vscode.WebviewView;
 
@@ -61,7 +61,7 @@ export default class SidebarMarkdownNotesProvider implements vscode.WebviewViewP
     });
 
     vscode.workspace.onDidChangeConfiguration((e) => {
-      if (e.affectsConfiguration('sidebar-markdown-notes')) {
+      if (e.affectsConfiguration('mdpad')) {
         this.config = getConfig();
         webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
       }
@@ -152,7 +152,7 @@ export default class SidebarMarkdownNotesProvider implements vscode.WebviewViewP
         <link href="${markdownCss}" rel="stylesheet">
 				<link href="${styleMainUri}" rel="stylesheet">
 
-				<title>Sidebar markdown notes</title>
+				<title>mdpad</title>
 			</head>
       <body>
 

@@ -5,3 +5,6 @@ node_modules/
 out/
 .vs/
 dist
+.claude/plans/
+.superpowers/
+superpowers/

@@ -1,10 +1,6 @@
-# sidebar-markdown-notes
-
-[![Marketplace Version](images/icon.png 'Current Release')](https://marketplace.visualstudio.com/items?itemName=assisrMatheus.sidebar-markdown-notes)
+# mdpad
 
 Write down notes directly in the sidebar using markdown.
-
-![demonstration](https://i.imgur.com/O5Tepg8.gif)
 
 - Multiple pages
 - Github Flavored Markdown Support
@@ -12,7 +8,7 @@ Write down notes directly in the sidebar using markdown.
 
 ## Available configurations
 
-- `sidebar-markdown-notes.leftMargin`: Adds a left margin to the entire view so it aligns with other content in the sidebar.
+- `mdpad.leftMargin`: Adds a left margin to the entire view so it aligns with other content in the sidebar.
 
 ---
 

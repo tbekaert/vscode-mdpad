@@ -1,18 +1,13 @@
 {
-	"name": "sidebar-markdown-notes",
-	"displayName": "sidebar-markdown-notes",
+	"name": "mdpad",
+	"displayName": "mdpad",
 	"description": "Take notes in your sidebar using markdown",
 	"version": "1.2.0",
-	"publisher": "assisrMatheus",
-	"author": {
-		"email": "assisr.matheus@gmail.com",
-		"name": "Matheus Assis Rios",
-		"url": "https://github.com/AssisrMatheus"
-	},
+	"publisher": "tbekaert",
 	"license": "GPL-3.0-or-later",
 	"icon": "images/icon.png",
 	"repository": {
-		"url": "https://www.github.com/AssisrMatheus/sidebar-markdown-notes",
+		"url": "https://github.com/tbekaert/vscode-mdpad",
 		"type": "git"
 	},
 	"keywords": [
@@ -36,11 +31,11 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:sidebar-markdown-notes.resetData",
-		"onCommand:sidebar-markdown-notes.previousPage",
-		"onCommand:sidebar-markdown-notes.nextPage",
-		"onCommand:sidebar-markdown-notes.togglePreview",
-		"onView:sidebarMarkdownNotes.webview"
+		"onCommand:mdpad.resetData",
+		"onCommand:mdpad.previousPage",
+		"onCommand:mdpad.nextPage",
+		"onCommand:mdpad.togglePreview",
+		"onView:mdpad.webview"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
@@ -48,38 +43,38 @@
 			"explorer": [
 				{
 					"type": "webview",
-					"id": "sidebarMarkdownNotes.webview",
-					"name": "Sidebar markdown notes"
+					"id": "mdpad.webview",
+					"name": "mdpad"
 				}
 			]
 		},
 		"commands": [
 			{
-				"command": "sidebar-markdown-notes.resetData",
-				"category": "Sidebar markdown notes",
+				"command": "mdpad.resetData",
+				"category": "mdpad",
 				"title": "Reset data"
 			},
 			{
-				"command": "sidebar-markdown-notes.previousPage",
-				"category": "Sidebar markdown notes",
+				"command": "mdpad.previousPage",
+				"category": "mdpad",
 				"title": "Previous page",
 				"icon": "$(arrow-left)"
 			},
 			{
-				"command": "sidebar-markdown-notes.nextPage",
-				"category": "Sidebar markdown notes",
+				"command": "mdpad.nextPage",
+				"category": "mdpad",
 				"title": "Next page",
 				"icon": "$(arrow-right)"
 			},
 			{
-				"command": "sidebar-markdown-notes.togglePreview",
-				"category": "Sidebar markdown notes",
+				"command": "mdpad.togglePreview",
+				"category": "mdpad",
 				"title": "Toggle preview",
 				"icon": "$(open-preview)"
 			},
 			{
-				"command": "sidebar-markdown-notes.exportPage",
-				"category": "Sidebar markdown notes",
+				"command": "mdpad.exportPage",
+				"category": "mdpad",
 				"title": "Export page",
 				"icon": "$(symbol-reference)"
 			}
@@ -87,32 +82,32 @@
 		"menus": {
 			"view/title": [
 				{
-					"command": "sidebar-markdown-notes.previousPage",
+					"command": "mdpad.previousPage",
 					"group": "navigation@0",
-					"when": "view == sidebarMarkdownNotes.webview"
+					"when": "view == mdpad.webview"
 				},
 				{
-					"command": "sidebar-markdown-notes.nextPage",
+					"command": "mdpad.nextPage",
 					"group": "navigation@1",
-					"when": "view == sidebarMarkdownNotes.webview"
+					"when": "view == mdpad.webview"
 				},
 				{
-					"command": "sidebar-markdown-notes.togglePreview",
+					"command": "mdpad.togglePreview",
 					"group": "navigation@2",
-					"when": "view == sidebarMarkdownNotes.webview"
+					"when": "view == mdpad.webview"
 				},
 				{
-					"command": "sidebar-markdown-notes.exportPage",
+					"command": "mdpad.exportPage",
 					"group": "navigation@3",
-					"when": "view == sidebarMarkdownNotes.webview"
+					"when": "view == mdpad.webview"
 				}
 			]
 		},
 		"configuration": [
 			{
-				"title": "Sidebar markdown notes",
+				"title": "mdpad",
 				"properties": {
-					"sidebar-markdown-notes.leftMargin": {
+					"mdpad.leftMargin": {
 						"type": "boolean",
 						"default": false,
 						"description": "Whether or not a left margin should be added to the main view. To align it with other elements"
@@ -129,9 +124,9 @@
 		"compile": "tsc -p ./",
 		"lint": "eslint src --ext ts",
 		"watch": "webpack --mode development --watch",
-		"pretest": "npm run compile && npm run lint",
+		"pretest": "pnpm compile && pnpm lint",
 		"test": "node ./out/test/runTest.js",
-		"deploy": "vsce publish --yarn"
+		"deploy": "vsce publish"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.3",

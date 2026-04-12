@@ -4,7 +4,7 @@ class Config {
   private readonly config: vscode.WorkspaceConfiguration;
 
   constructor() {
-    this.config = vscode.workspace.getConfiguration('sidebar-markdown-notes');
+    this.config = vscode.workspace.getConfiguration('mdpad');
   }
 
   get leftMargin() {
