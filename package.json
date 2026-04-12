@@ -2,7 +2,7 @@
 	"name": "mdpad",
 	"displayName": "mdpad",
 	"description": "Take notes in your sidebar using markdown",
-	"version": "1.2.0",
+	"version": "0.0.1",
 	"publisher": "tbekaert",
 	"license": "GPL-3.0-or-later",
 	"icon": "images/icon.png",
@@ -21,7 +21,7 @@
 		"checklist"
 	],
 	"engines": {
-		"vscode": "^1.50.0"
+		"vscode": "^1.75.0"
 	},
 	"extensionKind": [
 		"ui",
@@ -29,13 +29,6 @@
 	],
 	"categories": [
 		"Other"
-	],
-	"activationEvents": [
-		"onCommand:mdpad.resetData",
-		"onCommand:mdpad.previousPage",
-		"onCommand:mdpad.nextPage",
-		"onCommand:mdpad.togglePreview",
-		"onView:mdpad.webview"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
@@ -129,27 +122,25 @@
 		"deploy": "vsce publish"
 	},
 	"devDependencies": {
-		"@types/glob": "^7.1.3",
-		"@types/marked": "^1.1.0",
-		"@types/mocha": "^8.0.0",
-		"@types/node": "^12.11.7",
-		"@types/vscode": "^1.50.0",
+		"@types/mocha": "^10.0.0",
+		"@types/node": "^20.0.0",
+		"@types/vscode": "^1.75.0",
 		"@typescript-eslint/eslint-plugin": "^4.1.1",
 		"@typescript-eslint/parser": "^4.1.1",
+		"@vscode/test-electron": "^2.3.0",
+		"@vscode/vsce": "^3.0.0",
 		"eslint": "^7.9.0",
 		"eslint-config-airbnb-base": "^14.2.0",
 		"eslint-config-prettier": "^6.15.0",
 		"eslint-plugin-import": "^2.22.1",
 		"eslint-plugin-prettier": "^3.1.4",
-		"glob": "^7.1.6",
-		"mocha": "^8.1.3",
+		"glob": "^10.3.0",
+		"mocha": "^10.2.0",
 		"prettier": "^2.1.2",
-		"ts-loader": "^8.0.11",
-		"typescript": "^4.0.2",
-		"vsce": "^1.81.1",
-		"vscode-test": "^1.4.0",
-		"webpack": "^5.4.0",
-		"webpack-cli": "^4.2.0"
+		"ts-loader": "^9.5.0",
+		"typescript": "^5.7.0",
+		"webpack": "^5.90.0",
+		"webpack-cli": "^5.1.0"
 	},
 	"dependencies": {
 		"dompurify": "^2.2.0",
