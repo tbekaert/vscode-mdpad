@@ -1,5 +1,4 @@
 import assert from 'node:assert'
-import { suite, test } from 'mocha'
 import * as vscode from 'vscode'
 
 suite('Extension', () => {
