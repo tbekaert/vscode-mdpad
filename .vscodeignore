@@ -7,14 +7,11 @@ docs/**
 .yarnrc
 vsc-extension-quickstart.md
 **/tsconfig.json
-**/.eslintrc.json
 **/*.map
 **/*.ts
 node_modules
 pnpm-lock.yaml
-.eslintignore
-.eslintrc.js
-.prettierrc.js
+biome.json
 webpack.config.js
 .github
 .superpowers
