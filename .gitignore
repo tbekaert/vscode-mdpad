@@ -5,6 +5,7 @@ node_modules/
 out/
 .vs/
 dist
+.vscode-test/
 .claude/plans/
 .superpowers/
 superpowers/

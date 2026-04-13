@@ -15,43 +15,59 @@ import { tableAutoFormat } from './tableFormatter'
 export const wrapSelection = (view: EditorView, marker: string): boolean => {
   const { from, to } = view.state.selection.main
   const selected = view.state.doc.sliceString(from, to)
+  const docText = view.state.doc.toString()
+  const ml = marker.length
 
+  // Case 1: selection already includes the markers — unwrap
   if (
     selected.startsWith(marker) &&
     selected.endsWith(marker) &&
-    selected.length > marker.length * 2
+    selected.length > ml * 2
   ) {
     view.dispatch({
-      changes: {
-        from,
-        to,
-        insert: selected.slice(marker.length, -marker.length),
-      },
+      changes: { from, to, insert: selected.slice(ml, -ml) },
     })
     return true
   }
 
-  const before = view.state.doc.sliceString(
-    Math.max(0, from - marker.length),
-    from,
-  )
+  // Case 2: markers are immediately surrounding the selection/cursor — unwrap
+  const before = view.state.doc.sliceString(Math.max(0, from - ml), from)
   const after = view.state.doc.sliceString(
     to,
-    Math.min(view.state.doc.length, to + marker.length),
+    Math.min(view.state.doc.length, to + ml),
   )
   if (before === marker && after === marker) {
     view.dispatch({
       changes: [
-        { from: from - marker.length, to: from, insert: '' },
-        { from: to, to: to + marker.length, insert: '' },
+        { from: from - ml, to: from, insert: '' },
+        { from: to, to: to + ml, insert: '' },
       ],
     })
     return true
   }
 
+  // Case 3: cursor (collapsed) is inside a wrapped region — find enclosing markers and unwrap
+  if (from === to) {
+    const openIdx = docText.lastIndexOf(marker, from - 1)
+    if (openIdx !== -1) {
+      const closeIdx = docText.indexOf(marker, openIdx + ml)
+      if (closeIdx !== -1 && closeIdx !== openIdx && from <= closeIdx + ml) {
+        // cursor is inside [openIdx .. closeIdx + ml]; remove closing marker first (higher index)
+        view.dispatch({
+          changes: [
+            { from: closeIdx, to: closeIdx + ml, insert: '' },
+            { from: openIdx, to: openIdx + ml, insert: '' },
+          ],
+        })
+        return true
+      }
+    }
+  }
+
+  // Case 4: wrap the selection
   view.dispatch({
     changes: { from, to, insert: `${marker}${selected}${marker}` },
-    selection: { anchor: from + marker.length, head: to + marker.length },
+    selection: { anchor: from + ml, head: to + ml },
   })
   return true
 }

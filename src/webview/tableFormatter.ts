@@ -5,7 +5,7 @@ import { type EditorView, ViewPlugin, type ViewUpdate } from '@codemirror/view'
 // Table parsing
 // ---------------------------------------------------------------------------
 
-const parseRow = (line: string): string[] => {
+export const parseRow = (line: string): string[] => {
   // Split by `|`, trim each cell, ignore leading/trailing empty cells from outer pipes
   const raw = line.split('|')
   // Remove first and last if they're empty (from leading/trailing `|`)
@@ -17,7 +17,7 @@ const parseRow = (line: string): string[] => {
 const isSeparatorRow = (line: string): boolean =>
   /^\|?[\s-:|]+\|?$/.test(line) && line.includes('-')
 
-const buildRow = (
+export const buildRow = (
   cells: string[],
   widths: number[],
   isSep: boolean,
@@ -39,7 +39,7 @@ const buildRow = (
   return `| ${parts.join(' | ')} |`
 }
 
-const formatTable = (tableText: string): string | null => {
+export const formatTable = (tableText: string): string | null => {
   const lines = tableText.split('\n')
   if (lines.length < 2) return null
 

@@ -1,9 +1,9 @@
 import type { Page } from './types'
 
-const deriveTitle = (content: string): string => {
+export const deriveTitle = (content: string): string => {
   const lines = content.split('\n')
   for (const line of lines) {
-    const heading = line.match(/^#\s+(.+)/)
+    const heading = line.match(/^#{1,6}\s+(.+)/)
     if (heading) {
       return heading[1].trim().substring(0, 50)
     }
