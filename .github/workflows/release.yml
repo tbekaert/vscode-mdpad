@@ -29,8 +29,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  publish:
+  package:
     runs-on: ubuntu-latest
+    outputs:
+      bumped: ${{ steps.version.outputs.bumped }}
+      vsix: ${{ steps.package.outputs.vsix }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -62,19 +65,42 @@ jobs:
           pnpm run publish:extension
           echo "vsix=$(ls *.vsix)" >> "$GITHUB_OUTPUT"
 
-      - name: Publish to Open VSX
+      - name: Upload VSIX
         if: steps.version.outputs.bumped == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix
+          path: ${{ steps.package.outputs.vsix }}
+
+  publish-open-vsx:
+    needs: package
+    if: needs.package.outputs.bumped == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: vsix
+
+      - name: Publish to Open VSX
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           pat: ${{ secrets.OPEN_VSX_TOKEN }}
-          extensionFile: ${{ steps.package.outputs.vsix }}
+          extensionFile: ${{ needs.package.outputs.vsix }}
           skipDuplicate: true
 
+  publish-vscode-marketplace:
+    needs: package
+    if: needs.package.outputs.bumped == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: vsix
+
       - name: Publish to VS Code Marketplace
-        if: steps.version.outputs.bumped == 'true'
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           pat: ${{ secrets.VSCE_PAT }}
           registryUrl: https://marketplace.visualstudio.com
-          extensionFile: ${{ steps.package.outputs.vsix }}
+          extensionFile: ${{ needs.package.outputs.vsix }}
           skipDuplicate: true
