@@ -25,6 +25,11 @@ export const activate = (context: vscode.ExtensionContext): void => {
     () => {},
   )
 
+  const syncEnabled = vscode.workspace
+    .getConfiguration('mdpad')
+    .get<boolean>('syncGlobalNotes', false)
+  context.globalState.setKeysForSync(syncEnabled ? ['mdpad.notes'] : [])
+
   vscode.commands.executeCommand('setContext', 'mdpad.scope', currentScope)
 
   const statusBar = vscode.window.createStatusBarItem(
@@ -216,6 +221,40 @@ export const activate = (context: vscode.ExtensionContext): void => {
     }),
   )
 
+  context.subscriptions.push(
+    vscode.commands.registerCommand('mdpad.exportPage', async () => {
+      const state = getActiveStorage().getState()
+      const page = state.pages.find(p => p.id === state.activeId)
+      if (!page) return
+      const title = deriveTitle(page.content)
+      const fileName =
+        title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, '') || 'note'
+      const uri = await vscode.window.showSaveDialog({
+        defaultUri: vscode.Uri.file(`${fileName}.md`),
+        filters: { Markdown: ['md'] },
+      })
+      if (uri) {
+        await vscode.workspace.fs.writeFile(
+          uri,
+          Buffer.from(page.content, 'utf-8'),
+        )
+        vscode.window.showInformationMessage(`Exported to ${uri.fsPath}`)
+      }
+    }),
+  )
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('mdpad.openSettings', () => {
+      vscode.commands.executeCommand(
+        'workbench.action.openSettings',
+        '@ext:tbekaert.mdpad',
+      )
+    }),
+  )
+
   const postCommandToActive = (command: MdpadCommand) => {
     if (panelProvider.isActive) {
       panelProvider.postCommand(command)
@@ -246,6 +285,12 @@ export const activate = (context: vscode.ExtensionContext): void => {
     vscode.workspace.onDidChangeConfiguration(e => {
       if (e.affectsConfiguration('mdpad')) {
         sendSettingsToActive()
+      }
+      if (e.affectsConfiguration('mdpad.syncGlobalNotes')) {
+        const sync = vscode.workspace
+          .getConfiguration('mdpad')
+          .get<boolean>('syncGlobalNotes', false)
+        context.globalState.setKeysForSync(sync ? ['mdpad.notes'] : [])
       }
     }),
   )

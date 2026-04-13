@@ -21,7 +21,7 @@ That's it. Your notes persist across restarts, per workspace. Toggle to **Global
 
 ### Workspace & Global notes
 
-Notes default to workspace scope — tied to the current project. Click the scope toggle in the title bar to switch to global notes, accessible from any workspace. The page picker lists notes from both scopes.
+Notes default to workspace scope — tied to the current project. Click the scope toggle in the title bar to switch to global notes, accessible from any workspace. The page picker lists notes from both scopes. Optionally sync global notes across devices via VS Code Settings Sync (opt-in, disabled by default).
 
 ### Muted-syntax editing
 
@@ -61,6 +61,11 @@ Fenced code blocks get syntax highlighting for 19 languages including JavaScript
 | `mdpad.listIndentSize` | `2` | Spaces per list indent level. |
 | `mdpad.lineNumbers` | `false` | Show line numbers in the gutter. |
 | `mdpad.lineWrapping` | `true` | Wrap long lines. |
+| `mdpad.syncGlobalNotes` | `false` | Sync global notes across devices via Settings Sync. Opt-in — once synced, data cannot be removed from the remote. |
+
+### Export
+
+Run **mdpad: Export Current Page** to save the active note as a `.md` file.
 
 ### Interactive elements
 
@@ -71,7 +76,7 @@ Fenced code blocks get syntax highlighting for 19 languages including JavaScript
 
 ### Floating panel
 
-Run the command **Mdpad: Open as Panel** to detach mdpad from the sidebar and use it as a standalone editor panel. Dock it anywhere in your VS Code layout.
+Run the command **mdpad: Open as Panel** to detach mdpad from the sidebar and use it as a standalone editor panel. Dock it anywhere in your VS Code layout.
 
 ### GFM support
 

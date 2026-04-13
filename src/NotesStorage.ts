@@ -16,7 +16,7 @@ A lightweight markdown notepad inside VS Code. Just type — markdown syntax is 
 - Create multiple pages with the toolbar above
 - \`Cmd/Ctrl+click\` on [links](https://github.com) to open them
 
-> Tip: Run the command **Mdpad: Open as Panel** to use mdpad as a floating editor panel.
+> Tip: Run the command **mdpad: Open as Panel** to use mdpad as a floating editor panel.
 `
 
 const createPage = (content = ''): Page => ({

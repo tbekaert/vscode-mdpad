@@ -32,7 +32,7 @@ pnpm changeset status  # Show pending changesets
 Two webpack bundles from one config file:
 
 **Extension host** (`dist/extension.js`, target: node):
-- `src/extension.ts` — Entry point. Dual storage (workspace + global), scope routing, commands: `openPanel`, `newPage`, `deletePage`, `switchToGlobal/Workspace`, `toggleBold/Italic/Strikethrough`.
+- `src/extension.ts` — Entry point. Dual storage (workspace + global), scope routing, Settings Sync for global notes, commands: `openPanel`, `newPage`, `deletePage`, `exportPage`, `switchToGlobal/Workspace`, `toggleBold/Italic/Strikethrough`.
 - `src/SidebarProvider.ts` — `WebviewViewProvider` for the Explorer sidebar. Accepts storage getter for scope switching.
 - `src/PanelProvider.ts` — Singleton `WebviewPanel` for floating editor. Exclusive mode: only sidebar or panel active at a time. Accepts storage getter for scope switching.
 - `src/NotesStorage.ts` — CRUD over any `vscode.Memento` (workspaceState or globalState). Cached reads. Stores `{ pages: Page[], activeId }`.
@@ -54,9 +54,14 @@ Two webpack bundles from one config file:
 
 **Muted-syntax, not hidden-syntax.** All markdown characters stay visible but dimmed using `--vscode-editorLineNumber-foreground`. No widget replacements, no raw mode toggle. This avoids layout jumps, cursor issues, and CPU spikes from the original Typora-style approach.
 
+## Settings Sync
+
+Global notes can optionally be synced across devices via VS Code's Settings Sync (`context.globalState.setKeysForSync`). This is **opt-in** (disabled by default via `mdpad.syncGlobalNotes`) because there is no VS Code API to remove data from the sync remote once it's been synced. Disabling the setting stops future syncing but does not delete already-synced data.
+
 ## Naming
 
-- Command prefix: `mdpad`
+- Product name: always lowercase `mdpad` in user-facing text (UI, docs, commit messages). PascalCase `Mdpad` is only acceptable in TypeScript type names (e.g. `MdpadSettings`).
+- Command prefix: `mdpad` (use `category: "mdpad"` in package.json, not a title prefix)
 - View ID: `mdpad.notesView`
 - Panel ID: `mdpad.panel`
 - Storage key: `mdpad.notes`
