@@ -129,11 +129,14 @@
     "test": "pnpm test:unit && pnpm test:integration",
     "test:unit": "mocha out/test/unit/**/*.test.js",
     "test:integration": "vscode-test",
-    "deploy": "vsce publish"
+    "deploy": "vsce publish",
+    "changeset": "changeset",
+    "publish:extension": "pnpm vscode:prepublish && vsce package --no-dependencies"
   },
   "devDependencies": {
     "@bekaert-dev/biome-config": "^0.1.1",
     "@biomejs/biome": "^2.4.11",
+    "@changesets/cli": "^2.30.0",
     "@types/jsdom": "^28.0.1",
     "@types/mocha": "^10.0.0",
     "@types/node": "^20.0.0",

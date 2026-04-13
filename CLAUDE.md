@@ -22,8 +22,9 @@ pnpm format           # Biome auto-fix on src/
 # Test in VS Code
 # Press F5 — launches extension host with the "watch" build task
 
-# Publish
-pnpm deploy           # vsce publish
+# Release
+pnpm changeset         # Create a changeset for your changes
+pnpm changeset status  # Show pending changesets
 ```
 
 ## Architecture
@@ -62,4 +63,5 @@ Two webpack bundles from one config file:
 ## Conventions
 
 - Biome for linting and formatting (via `@bekaert-dev/biome-config` shared preset).
+- Changesets for versioning: run `pnpm changeset` after making changes worth releasing. The release workflow creates a version PR on push to main, and publishes to both marketplaces on merge.
 - License: GPL-3.0-or-later.
