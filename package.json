@@ -105,12 +105,12 @@
           "when": "view == mdpad.notesView"
         },
         {
-          "command": "mdpad.newPage",
+          "command": "mdpad.deletePage",
           "group": "navigation@3",
           "when": "view == mdpad.notesView"
         },
         {
-          "command": "mdpad.deletePage",
+          "command": "mdpad.newPage",
           "group": "navigation@4",
           "when": "view == mdpad.notesView"
         }

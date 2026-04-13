@@ -67,7 +67,13 @@ export const activate = (context: vscode.ExtensionContext): void => {
   )
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('mdpad.deletePage', () => {
+    vscode.commands.registerCommand('mdpad.deletePage', async () => {
+      const confirmed = await vscode.window.showWarningMessage(
+        'Delete this page?',
+        { modal: true },
+        'Delete',
+      )
+      if (confirmed !== 'Delete') return
       const { activeId } = storage.getState()
       storage.deletePage(activeId)
       switchAndUpdate()
