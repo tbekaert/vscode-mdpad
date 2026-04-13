@@ -17,9 +17,17 @@ export const handleWebviewMessage = (
       break
     }
     case 'openLink': {
-      const uri = vscode.Uri.parse(message.url)
-      if (['http', 'https', 'file'].includes(uri.scheme)) {
-        vscode.env.openExternal(uri)
+      const url = message.url
+      if (/^https?:\/\//.test(url)) {
+        vscode.env.openExternal(vscode.Uri.parse(url))
+      } else {
+        const workspaceFolder = vscode.workspace.workspaceFolders?.[0]
+        if (!workspaceFolder) break
+        const fileUri = vscode.Uri.joinPath(workspaceFolder.uri, url)
+        vscode.workspace.openTextDocument(fileUri).then(
+          doc => vscode.window.showTextDocument(doc),
+          () => {},
+        )
       }
       break
     }
