@@ -1,5 +1,11 @@
 # mdpad
 
+## 0.1.2
+
+### Patch Changes
+
+- 0bddd90: Fix release workflow: resolve .vsix filename instead of passing a literal glob to the publish action
+
 ## 0.1.1
 
 ### Patch Changes
