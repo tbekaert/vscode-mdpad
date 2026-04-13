@@ -135,6 +135,36 @@
           "when": "view == mdpad.notesView && mdpad.scope == global"
         }
       ]
+    },
+    "configuration": {
+      "title": "mdpad",
+      "properties": {
+        "mdpad.fontFamily": {
+          "type": "string",
+          "default": "inherit",
+          "description": "Font family for the editor. \"inherit\" uses the VS Code theme font."
+        },
+        "mdpad.lineHeight": {
+          "type": "number",
+          "default": 1.6,
+          "description": "Line height in the editor."
+        },
+        "mdpad.listIndentSize": {
+          "type": "number",
+          "default": 2,
+          "description": "Number of spaces per list indent level."
+        },
+        "mdpad.lineNumbers": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show line numbers in the gutter."
+        },
+        "mdpad.lineWrapping": {
+          "type": "boolean",
+          "default": true,
+          "description": "Wrap long lines."
+        }
+      }
     }
   },
   "scripts": {

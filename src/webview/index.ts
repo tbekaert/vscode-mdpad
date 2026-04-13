@@ -66,6 +66,10 @@ const init = (): void => {
           }
           break
         }
+        case 'settings': {
+          editor?.applySettings(message)
+          break
+        }
       }
     },
   )

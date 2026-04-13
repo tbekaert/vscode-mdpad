@@ -16,7 +16,16 @@ export type WebviewMessage =
 
 export type MdpadCommand = 'toggleBold' | 'toggleItalic' | 'toggleStrikethrough'
 
+export interface MdpadSettings {
+  fontFamily: string
+  lineHeight: number
+  listIndentSize: number
+  lineNumbers: boolean
+  lineWrapping: boolean
+}
+
 // Extension -> Webview messages
 export type ExtensionMessage =
   | { type: 'init'; content: string }
   | { type: 'command'; command: MdpadCommand }
+  | ({ type: 'settings' } & MdpadSettings)
