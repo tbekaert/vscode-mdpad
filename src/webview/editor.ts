@@ -1,5 +1,6 @@
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { markdown } from '@codemirror/lang-markdown'
+import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { EditorState } from '@codemirror/state'
 import {
   drawSelection,
@@ -8,7 +9,9 @@ import {
   keymap,
   placeholder,
 } from '@codemirror/view'
+import { tags } from '@lezer/highlight'
 import { GFM } from '@lezer/markdown'
+import { codeLanguages } from './codeLanguages'
 import { attachClickHandlers, markdownDecorations } from './decorations'
 import { tableAutoFormat } from './tableFormatter'
 
@@ -198,6 +201,18 @@ const mdKeymap: KeyBinding[] = [
 export const isLinkable = (text: string): boolean =>
   /^https?:\/\//.test(text) || /\.\w{1,10}$/.test(text.trim())
 
+const autoCloseFence = EditorView.inputHandler.of((view, from, to, text) => {
+  if (text !== '`') return false
+  const line = view.state.doc.lineAt(from)
+  const before = line.text.slice(0, from - line.from)
+  if (before !== '``') return false
+  view.dispatch({
+    changes: { from, to, insert: '`\n\n```' },
+    selection: { anchor: from + 1 },
+  })
+  return true
+})
+
 const pasteAsLink = EditorView.domEventHandlers({
   paste(event, view) {
     const { from, to } = view.state.selection.main
@@ -214,6 +229,90 @@ const pasteAsLink = EditorView.domEventHandlers({
     return true
   },
 })
+
+const codeHighlight = HighlightStyle.define([
+  {
+    tag: tags.keyword,
+    color: 'var(--vscode-debugTokenExpression-name, #c586c0)',
+  },
+  {
+    tag: tags.controlKeyword,
+    color: 'var(--vscode-debugTokenExpression-name, #c586c0)',
+  },
+  {
+    tag: tags.operatorKeyword,
+    color: 'var(--vscode-debugTokenExpression-name, #c586c0)',
+  },
+  {
+    tag: tags.definitionKeyword,
+    color: 'var(--vscode-debugTokenExpression-name, #c586c0)',
+  },
+  {
+    tag: tags.string,
+    color: 'var(--vscode-debugTokenExpression-string, #ce9178)',
+  },
+  {
+    tag: tags.number,
+    color: 'var(--vscode-debugTokenExpression-number, #b5cea8)',
+  },
+  {
+    tag: tags.bool,
+    color: 'var(--vscode-debugTokenExpression-boolean, #4e94ce)',
+  },
+  {
+    tag: tags.comment,
+    color: 'var(--vscode-editorLineNumber-foreground, #6a9955)',
+    fontStyle: 'italic',
+  },
+  {
+    tag: tags.lineComment,
+    color: 'var(--vscode-editorLineNumber-foreground, #6a9955)',
+    fontStyle: 'italic',
+  },
+  {
+    tag: tags.blockComment,
+    color: 'var(--vscode-editorLineNumber-foreground, #6a9955)',
+    fontStyle: 'italic',
+  },
+  {
+    tag: tags.typeName,
+    color: 'var(--vscode-symbolIcon-classForeground, #4ec9b0)',
+  },
+  {
+    tag: tags.className,
+    color: 'var(--vscode-symbolIcon-classForeground, #4ec9b0)',
+  },
+  {
+    tag: tags.function(tags.variableName),
+    color: 'var(--vscode-symbolIcon-functionForeground, #dcdcaa)',
+  },
+  {
+    tag: tags.definition(tags.variableName),
+    color: 'var(--vscode-symbolIcon-variableForeground, #9cdcfe)',
+  },
+  {
+    tag: tags.propertyName,
+    color: 'var(--vscode-symbolIcon-propertyForeground, #9cdcfe)',
+  },
+  {
+    tag: tags.attributeName,
+    color: 'var(--vscode-symbolIcon-propertyForeground, #9cdcfe)',
+  },
+  {
+    tag: tags.tagName,
+    color: 'var(--vscode-debugTokenExpression-name, #569cd6)',
+  },
+  {
+    tag: tags.attributeValue,
+    color: 'var(--vscode-debugTokenExpression-string, #ce9178)',
+  },
+  {
+    tag: tags.regexp,
+    color: 'var(--vscode-debugTokenExpression-string, #d16969)',
+  },
+  { tag: tags.operator, color: 'var(--vscode-editor-foreground, #d4d4d4)' },
+  { tag: tags.punctuation, color: 'var(--vscode-editor-foreground, #d4d4d4)' },
+])
 
 const vsCodeTheme = EditorView.theme({
   '&': {
@@ -261,7 +360,8 @@ export const createEditor = (
       extensions: [
         vsCodeTheme,
         EditorView.lineWrapping,
-        markdown({ extensions: GFM }),
+        markdown({ extensions: GFM, codeLanguages }),
+        syntaxHighlighting(codeHighlight),
         history(),
         drawSelection(),
         placeholder('Start typing your notes...'),
@@ -270,6 +370,7 @@ export const createEditor = (
         markdownDecorations,
         tableAutoFormat,
         pasteAsLink,
+        autoCloseFence,
       ],
     }),
     parent,
