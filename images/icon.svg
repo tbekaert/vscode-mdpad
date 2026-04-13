@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Background rounded square -->
+  <rect x="8" y="8" width="112" height="112" rx="24" ry="24" fill="#1e1e2e"/>
+
+  <!-- Notepad body -->
+  <rect x="24" y="30" width="80" height="82" rx="8" ry="8" fill="#f5f5f7"/>
+
+  <!-- Spiral-binding tabs -->
+  <rect x="42" y="18" width="6" height="20" rx="3" ry="3" fill="#f5f5f7"/>
+  <rect x="61" y="18" width="6" height="20" rx="3" ry="3" fill="#f5f5f7"/>
+  <rect x="80" y="18" width="6" height="20" rx="3" ry="3" fill="#f5f5f7"/>
+
+  <!-- "# " — muted hash, like the extension's dimmed syntax -->
+  <text x="33" y="69" font-family="'Courier New', monospace" font-size="30" font-weight="700" fill="#c7c7cc">#</text>
+
+  <!-- "md" — bold, dark -->
+  <text x="56" y="69" font-family="'Courier New', monospace" font-size="30" font-weight="700" fill="#2d2d2d">md</text>
+
+  <!-- Text lines -->
+  <rect x="36" y="82" width="48" height="3.5" rx="1.75" fill="#c7c7cc"/>
+  <rect x="36" y="94" width="36" height="3.5" rx="1.75" fill="#c7c7cc"/>
+</svg>

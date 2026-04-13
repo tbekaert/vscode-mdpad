@@ -1,10 +1,17 @@
+<img src="images/icon.png" alt="mdpad icon" width="128" />
+
 # mdpad
+
+[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/tbekaert.mdpad?label=VS%20Code%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=tbekaert.mdpad)
+[![Open VSX](https://img.shields.io/open-vsx/v/tbekaert/mdpad?label=Open%20VSX)](https://open-vsx.org/extension/tbekaert/mdpad)
 
 A lightweight markdown notepad inside VS Code. Type markdown and see it styled live — syntax stays visible but dimmed, content is formatted as you write.
 
+<img src="images/demo.gif" alt="mdpad demo" />
+
 ## Quick Start
 
-1. Install mdpad from the VS Code Marketplace
+1. Install mdpad from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=tbekaert.mdpad) or [Open VSX](https://open-vsx.org/extension/tbekaert/mdpad)
 2. Open the **Explorer sidebar** — mdpad appears as a panel
 3. Start typing markdown
 
