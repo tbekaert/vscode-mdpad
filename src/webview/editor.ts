@@ -195,6 +195,26 @@ const mdKeymap: KeyBinding[] = [
   { key: 'Shift-Tab', run: outdentList },
 ]
 
+export const isLinkable = (text: string): boolean =>
+  /^https?:\/\//.test(text) || /\.\w{1,10}$/.test(text.trim())
+
+const pasteAsLink = EditorView.domEventHandlers({
+  paste(event, view) {
+    const { from, to } = view.state.selection.main
+    if (from === to) return false
+    const pasted = event.clipboardData?.getData('text/plain')
+    if (!pasted || !isLinkable(pasted)) return false
+    const selected = view.state.doc.sliceString(from, to)
+    const link = `[${selected}](${pasted.trim()})`
+    view.dispatch({
+      changes: { from, to, insert: link },
+      selection: { anchor: from + link.length },
+    })
+    event.preventDefault()
+    return true
+  },
+})
+
 const vsCodeTheme = EditorView.theme({
   '&': {
     backgroundColor: 'var(--mdpad-bg)',
@@ -249,6 +269,7 @@ export const createEditor = (
         updateListener,
         markdownDecorations,
         tableAutoFormat,
+        pasteAsLink,
       ],
     }),
     parent,
