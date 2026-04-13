@@ -123,6 +123,7 @@ export const createEditor = (
       doc: initialContent,
       extensions: [
         vsCodeTheme,
+        EditorView.lineWrapping,
         markdown({ extensions: GFM }),
         history(),
         drawSelection(),
