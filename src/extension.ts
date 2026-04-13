@@ -1,60 +1,72 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import MdpadProvider from './webviewProvider';
+import { NotesStorage } from './NotesStorage';
+import { SidebarProvider } from './SidebarProvider';
+import { PanelProvider } from './PanelProvider';
+import type { MdpadCommand } from './webview/types';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
+export const activate = (context: vscode.ExtensionContext): void => {
+  const storage = new NotesStorage(context.workspaceState);
+  const sidebarProvider = new SidebarProvider(context.extensionUri, storage);
 
-  const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 1000);
-  context.subscriptions.push(statusBar);
+  const panelProvider = new PanelProvider(
+    context.extensionUri,
+    storage,
+    () => {},
+  );
 
-  const provider = new MdpadProvider(context.extensionUri, statusBar);
+  const sendInitToActive = () => {
+    if (panelProvider.isActive) {
+      panelProvider.sendInit();
+    } else {
+      sidebarProvider.sendInit();
+    }
+  };
 
-  // register some listener that make sure the status bar
-  // item always up-to-date
-  // context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(provider.updateStatusBar));
-  // context.subscriptions.push(vscode.window.onDidChangeTextEditorSelection(provider.updateStatusBar));
-
-  context.subscriptions.push(vscode.window.registerWebviewViewProvider(MdpadProvider.viewId, provider));
-
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with registerCommand
-  // The commandId parameter must match the command field in package.json
   context.subscriptions.push(
-    vscode.commands.registerCommand('mdpad.togglePreview', () => {
-      // The code you place here will be executed every time your command is executed
-      provider.togglePreview();
-    })
+    vscode.window.registerWebviewViewProvider(SidebarProvider.viewId, sidebarProvider),
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('mdpad.previousPage', () => {
-      provider.previousPage();
-    })
+    vscode.commands.registerCommand('mdpad.openPanel', () => {
+      sidebarProvider.detach();
+      panelProvider.open();
+    }),
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('mdpad.nextPage', () => {
-      provider.nextPage();
-    })
+    vscode.commands.registerCommand('mdpad.newPage', () => {
+      storage.newPage();
+      sendInitToActive();
+    }),
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('mdpad.resetData', () => {
-      provider.resetData();
-    })
+    vscode.commands.registerCommand('mdpad.deletePage', () => {
+      const { activeId } = storage.getState();
+      storage.deletePage(activeId);
+      sendInitToActive();
+    }),
+  );
+
+  const postCommandToActive = (command: MdpadCommand) => {
+    if (panelProvider.isActive) {
+      panelProvider.postCommand(command);
+    } else {
+      sidebarProvider.postCommand(command);
+    }
+  };
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('mdpad.toggleBold', () => postCommandToActive('toggleBold')),
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('mdpad.exportPage', () => {
-      provider.exportPage();
-    })
+    vscode.commands.registerCommand('mdpad.toggleItalic', () => postCommandToActive('toggleItalic')),
   );
-}
 
-// this method is called when your extension is deactivated
-export function deactivate() {}
+  context.subscriptions.push(
+    vscode.commands.registerCommand('mdpad.toggleStrikethrough', () => postCommandToActive('toggleStrikethrough')),
+  );
+};
+
+export const deactivate = (): void => {};
