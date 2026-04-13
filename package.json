@@ -2,7 +2,7 @@
   "name": "mdpad",
   "displayName": "mdpad",
   "description": "A lightweight markdown notepad inside VS Code",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "publisher": "tbekaert",
   "packageManager": "pnpm@10.29.2",
   "license": "GPL-3.0-or-later",
