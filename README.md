@@ -7,7 +7,7 @@
 
 A lightweight markdown notepad inside VS Code. Type markdown and see it styled live — syntax stays visible but dimmed, content is formatted as you write.
 
-<img src="images/demo.gif" alt="mdpad demo" />
+<img src="images/demo.gif" alt="mdpad demo" width="363" />
 
 ## Quick Start
 
