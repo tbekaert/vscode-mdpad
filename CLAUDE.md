@@ -4,22 +4,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-`mdpad` is a VS Code extension for writing and managing markdown notes directly inside the editor. It is a fork of the abandoned `sidebar-markdown-notes` extension, rebuilt with upgrades. Notes persist across sessions via webview state. Supports GFM, checkbox toggling, edit/preview toggle, page navigation, and export.
+`mdpad` is a VS Code extension for writing markdown notes directly inside the editor. It uses a muted-syntax approach: markdown characters stay visible but dimmed, while content is styled live (headings are large, bold is bold, etc.). No preview pane, no mode switching — just type and see.
+
+Forked from the abandoned `sidebar-markdown-notes` extension, fully rewritten with CodeMirror 6.
 
 ## Commands
 
 ```bash
 # Development
-pnpm webpack          # Build (development mode)
+pnpm webpack          # Build both bundles (development mode)
 pnpm webpack-dev      # Build + watch mode
-pnpm compile          # TypeScript-only compile (output: out/)
-
-# Production
-pnpm vscode:prepublish  # Production webpack build (output: dist/)
 
 # Quality
 pnpm lint             # ESLint on src/**/*.ts
-pnpm test             # Runs compile + lint + Mocha tests
+
+# Test in VS Code
+# Press F5 — launches extension host with the "watch" build task
 
 # Publish
 pnpm deploy           # vsce publish
@@ -27,34 +27,38 @@ pnpm deploy           # vsce publish
 
 ## Architecture
 
-The extension has two runtime contexts:
+Two webpack bundles from one config file:
 
-**Node.js context** (bundled by webpack into `dist/extension.js`):
-- `src/extension.ts` — Entry point. Registers 5 commands (`togglePreview`, `previousPage`, `nextPage`, `resetData`, `exportPage`), creates a status bar item, and instantiates the webview provider.
-- `src/webviewProvider.ts` — Implements `WebviewViewProvider`. Generates the sidebar HTML (with nonce-based CSP), handles bidirectional messaging with the webview, processes export and status bar messages, and listens to config changes.
-- `src/config.ts` — Wraps VS Code workspace config. Exposes `leftMargin` boolean setting.
+**Extension host** (`dist/extension.js`, target: node):
+- `src/extension.ts` — Entry point. Commands: `openPanel`, `newPage`, `deletePage`, `toggleBold/Italic/Strikethrough`.
+- `src/SidebarProvider.ts` — `WebviewViewProvider` for the Explorer sidebar.
+- `src/PanelProvider.ts` — Singleton `WebviewPanel` for floating editor. Exclusive mode: only sidebar or panel active at a time.
+- `src/NotesStorage.ts` — CRUD over `workspaceState`. Cached reads. Stores `{ pages: Page[], activeId }`.
+- `src/handleWebviewMessage.ts` — Shared message handler used by both providers.
+- `src/getWebviewHtml.ts` — HTML generation with nonce-based CSP.
 
-**Browser/webview context** (loaded as-is, not bundled):
-- `media/main.js` — All client-side logic: state management (pages, current page, edit/render mode), markdown rendering via `marked`, HTML sanitization via `dompurify`, custom renderers for checkboxes/todos, debounced state persistence, and page navigation.
-- `media/main.css`, `media/markdown.css`, `media/reset.css`, `media/vscode.css` — Styling.
-- `media/lib/` — Vendored libraries: `marked.min.js`, `purify.min.js`, `lodash.min.js`.
+**Webview** (`dist/webview.js`, target: web):
+- `src/webview/index.ts` — Entry point. Mounts editor, wires toolbar, handles postMessage.
+- `src/webview/editor.ts` — CodeMirror 6 with GFM, VS Code theme, keyboard shortcuts.
+- `src/webview/decorations.ts` — Muted-syntax ViewPlugin. Mark/line decorations only (no widgets, no Decoration.replace). Click handlers for checkboxes and links.
+- `src/webview/tableFormatter.ts` — Auto-aligns table columns on 500ms debounce after edits.
+- `src/webview/toolbar.ts` — Page dropdown (titles derived from content), new/delete buttons.
+- `src/webview/styles.css` — All styles: layout, VS Code CSS variable mapping, decoration classes.
+- `src/webview/types.ts` — Shared types: Page, NotesState, message protocol.
 
-## Build
+## Key Design Decision
 
-- Webpack bundles only the Node.js extension code (`src/` → `dist/extension.js`).
-- The `media/` folder (webview assets) is loaded at runtime, not bundled.
-- `vscode` module is externalized in webpack config.
-- TypeScript strict mode is enabled.
+**Muted-syntax, not hidden-syntax.** All markdown characters stay visible but dimmed using `--vscode-editorLineNumber-foreground`. No widget replacements, no raw mode toggle. This avoids layout jumps, cursor issues, and CPU spikes from the original Typora-style approach.
 
 ## Naming
 
-- Extension ID / command prefix: `mdpad`
-- View ID: `mdpad.webview`
-- Config namespace: `mdpad.*`
-- Provider class: `MdpadProvider`
+- Command prefix: `mdpad`
+- View ID: `mdpad.notesView`
+- Panel ID: `mdpad.panel`
+- Storage key: `mdpad.notes`
+- Context key: `mdpad.focused`
 
 ## Conventions
 
 - ESLint with Airbnb base + Prettier (120 char lines, 2-space indent).
 - License: GPL-3.0-or-later.
-- CI publishes to both VS Marketplace and Open VSX via GitHub Actions on push to main.
