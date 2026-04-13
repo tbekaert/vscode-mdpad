@@ -1,19 +1,22 @@
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { markdown } from '@codemirror/lang-markdown'
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
-import { EditorState } from '@codemirror/state'
+import { Compartment, EditorState } from '@codemirror/state'
 import {
   drawSelection,
   EditorView,
   type KeyBinding,
   keymap,
+  lineNumbers,
   placeholder,
 } from '@codemirror/view'
 import { tags } from '@lezer/highlight'
 import { GFM } from '@lezer/markdown'
 import { codeLanguages } from './codeLanguages'
 import { attachClickHandlers, markdownDecorations } from './decorations'
+import { setListIndent } from './listPatterns'
 import { tableAutoFormat } from './tableFormatter'
+import type { MdpadSettings } from './types'
 
 export const wrapSelection = (view: EditorView, marker: string): boolean => {
   const { from, to } = view.state.selection.main
@@ -321,9 +324,7 @@ const vsCodeTheme = EditorView.theme({
   },
   '.cm-content': {
     caretColor: 'var(--mdpad-fg)',
-    fontFamily: 'var(--vscode-font-family, sans-serif)',
     fontSize: 'var(--vscode-font-size, 13px)',
-    lineHeight: '1.6',
     padding: '12px 0',
   },
   '.cm-cursor': {
@@ -337,9 +338,38 @@ const vsCodeTheme = EditorView.theme({
   },
 })
 
+const codeMirrorSettings = new Compartment()
+
+const buildSettingsExtensions = (settings: MdpadSettings) => {
+  const fontFamily =
+    settings.fontFamily === 'inherit'
+      ? 'var(--vscode-font-family, sans-serif)'
+      : settings.fontFamily
+
+  const extensions = [
+    EditorView.theme({
+      '.cm-content': {
+        fontFamily,
+        lineHeight: String(settings.lineHeight),
+      },
+    }),
+  ]
+
+  if (settings.lineWrapping) {
+    extensions.push(EditorView.lineWrapping)
+  }
+
+  if (settings.lineNumbers) {
+    extensions.push(lineNumbers())
+  }
+
+  return extensions
+}
+
 export interface EditorHandle {
   view: EditorView
   setContent: (content: string) => void
+  applySettings: (settings: MdpadSettings) => void
 }
 
 export const createEditor = (
@@ -359,7 +389,7 @@ export const createEditor = (
       doc: initialContent,
       extensions: [
         vsCodeTheme,
-        EditorView.lineWrapping,
+        codeMirrorSettings.of([EditorView.lineWrapping]),
         markdown({ extensions: GFM, codeLanguages }),
         syntaxHighlighting(codeHighlight),
         history(),
@@ -387,5 +417,14 @@ export const createEditor = (
     }
   }
 
-  return { view, setContent }
+  const applySettings = (settings: MdpadSettings): void => {
+    setListIndent(settings.listIndentSize)
+    view.dispatch({
+      effects: codeMirrorSettings.reconfigure(
+        buildSettingsExtensions(settings),
+      ),
+    })
+  }
+
+  return { view, setContent, applySettings }
 }

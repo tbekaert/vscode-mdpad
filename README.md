@@ -52,6 +52,16 @@ Fenced code blocks get syntax highlighting for 19 languages including JavaScript
 | Indent list   | `Tab`          | `Tab`          |
 | Outdent list  | `Shift+Tab`    | `Shift+Tab`    |
 
+### Settings
+
+| Setting | Default | Description |
+| ------- | ------- | ----------- |
+| `mdpad.fontFamily` | `"inherit"` | Font family. `"inherit"` uses the VS Code theme font. |
+| `mdpad.lineHeight` | `1.6` | Line height in the editor. |
+| `mdpad.listIndentSize` | `2` | Spaces per list indent level. |
+| `mdpad.lineNumbers` | `false` | Show line numbers in the gutter. |
+| `mdpad.lineWrapping` | `true` | Wrap long lines. |
+
 ### Interactive elements
 
 - **Checkboxes** — click `[ ]` or `[x]` to toggle task list items

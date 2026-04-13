@@ -2,7 +2,11 @@ import * as vscode from 'vscode'
 import { getWebviewHtml } from './getWebviewHtml'
 import { handleWebviewMessage } from './handleWebviewMessage'
 import type { NotesStorage } from './NotesStorage'
-import type { MdpadCommand, WebviewMessage } from './webview/types'
+import type {
+  MdpadCommand,
+  MdpadSettings,
+  WebviewMessage,
+} from './webview/types'
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
   public static readonly viewId = 'mdpad.notesView'
@@ -62,6 +66,12 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   postCommand(command: MdpadCommand): void {
     if (this.view) {
       this.view.webview.postMessage({ type: 'command', command })
+    }
+  }
+
+  sendSettings(settings: MdpadSettings): void {
+    if (this.view) {
+      this.view.webview.postMessage({ type: 'settings', ...settings })
     }
   }
 

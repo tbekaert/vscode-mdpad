@@ -41,14 +41,14 @@ Two webpack bundles from one config file:
 
 **Webview** (`dist/webview.js`, target: web):
 - `src/webview/index.ts` — Entry point. Mounts editor, wires toolbar, handles postMessage.
-- `src/webview/editor.ts` — CodeMirror 6 with GFM, VS Code theme, keyboard shortcuts, list indent/outdent, paste-as-link, auto-close fences.
+- `src/webview/editor.ts` — CodeMirror 6 with GFM, VS Code theme, keyboard shortcuts, list indent/outdent, paste-as-link, auto-close fences. Uses a `codeMirrorSettings` Compartment for live setting reconfiguration.
 - `src/webview/decorations.ts` — Muted-syntax ViewPlugin. Mark/line decorations only (no widgets, no Decoration.replace). Click handlers for checkboxes and links.
 - `src/webview/codeLanguages.ts` — Eagerly loaded language grammars for syntax highlighting in fenced code blocks.
 - `src/webview/listPatterns.ts` — Shared regex patterns and constants for list handling.
 - `src/webview/tableFormatter.ts` — Auto-aligns table columns on 500ms debounce after edits.
 - `src/webview/toolbar.ts` — Page dropdown (titles derived from content), new/delete buttons.
 - `src/webview/styles.css` — All styles: layout, VS Code CSS variable mapping, decoration classes.
-- `src/webview/types.ts` — Shared types: Page, NotesState, message protocol.
+- `src/webview/types.ts` — Shared types: Page, NotesState, MdpadSettings, message protocol.
 
 ## Key Design Decision
 

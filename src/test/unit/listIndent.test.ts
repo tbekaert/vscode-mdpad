@@ -1,6 +1,7 @@
 import assert from 'node:assert'
-import { describe, it } from 'mocha'
+import { afterEach, describe, it } from 'mocha'
 import { indentList, outdentList } from '../../webview/editor'
+import { setListIndent } from '../../webview/listPatterns'
 import { createView } from './cmTestHelper'
 
 const cursorOnLine = (doc: string, lineNum: number): number => {
@@ -114,6 +115,51 @@ describe('listIndent', () => {
       const view = createView(doc, cursorOnLine(doc, 2))
       indentList(view)
       assert.strictEqual(view.state.doc.toString(), '1) a\n  1) b')
+    })
+  })
+
+  describe('custom indent size', () => {
+    afterEach(() => {
+      setListIndent(2)
+    })
+
+    it('indent uses 4-space indent when configured', () => {
+      setListIndent(4)
+      const doc = '- item'
+      const view = createView(doc, 0)
+      indentList(view)
+      assert.strictEqual(view.state.doc.toString(), '    * item')
+    })
+
+    it('outdent removes 4 spaces when configured', () => {
+      setListIndent(4)
+      const doc = '    * item'
+      const view = createView(doc, 0)
+      outdentList(view)
+      assert.strictEqual(view.state.doc.toString(), '- item')
+    })
+
+    it('ordered list indent uses 4-space indent', () => {
+      setListIndent(4)
+      const doc = '1. a\n2. b'
+      const view = createView(doc, cursorOnLine(doc, 2))
+      indentList(view)
+      assert.strictEqual(view.state.doc.toString(), '1. a\n    1. b')
+    })
+
+    it('round-trip with 4-space indent', () => {
+      setListIndent(4)
+      const doc = '1. a\n2. b\n3. c'
+      const view = createView(doc, cursorOnLine(doc, 2))
+      indentList(view)
+      assert.strictEqual(view.state.doc.toString(), '1. a\n    1. b\n2. c')
+
+      const view2 = createView(
+        view.state.doc.toString(),
+        cursorOnLine(view.state.doc.toString(), 2),
+      )
+      outdentList(view2)
+      assert.strictEqual(view2.state.doc.toString(), '1. a\n2. b\n3. c')
     })
   })
 })

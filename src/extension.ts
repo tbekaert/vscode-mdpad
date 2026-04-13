@@ -3,7 +3,7 @@ import { deriveTitle } from './deriveTitle'
 import { NotesStorage } from './NotesStorage'
 import { PanelProvider } from './PanelProvider'
 import { SidebarProvider } from './SidebarProvider'
-import type { MdpadCommand } from './webview/types'
+import type { MdpadCommand, MdpadSettings } from './webview/types'
 
 export const activate = (context: vscode.ExtensionContext): void => {
   const workspaceStorage = new NotesStorage(context.workspaceState)
@@ -37,11 +37,34 @@ export const activate = (context: vscode.ExtensionContext): void => {
   const scopeLabel = (): string =>
     currentScope === 'workspace' ? 'Workspace' : 'Global'
 
+  const getSettings = (): MdpadSettings => {
+    const config = vscode.workspace.getConfiguration('mdpad')
+    return {
+      fontFamily: config.get<string>('fontFamily', 'inherit'),
+      lineHeight: config.get<number>('lineHeight', 1.6),
+      listIndentSize: config.get<number>('listIndentSize', 2),
+      lineNumbers: config.get<boolean>('lineNumbers', false),
+      lineWrapping: config.get<boolean>('lineWrapping', true),
+    }
+  }
+
+  const sendSettingsToActive = () => {
+    const settings = getSettings()
+    if (panelProvider.isActive) {
+      panelProvider.sendSettings(settings)
+    } else {
+      sidebarProvider.sendSettings(settings)
+    }
+  }
+
   const sendInitToActive = () => {
+    const settings = getSettings()
     if (panelProvider.isActive) {
       panelProvider.sendInit()
+      panelProvider.sendSettings(settings)
     } else {
       sidebarProvider.sendInit()
+      sidebarProvider.sendSettings(settings)
     }
   }
 
@@ -217,6 +240,14 @@ export const activate = (context: vscode.ExtensionContext): void => {
     vscode.commands.registerCommand('mdpad.toggleStrikethrough', () =>
       postCommandToActive('toggleStrikethrough'),
     ),
+  )
+
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration(e => {
+      if (e.affectsConfiguration('mdpad')) {
+        sendSettingsToActive()
+      }
+    }),
   )
 
   updateStatusBar()

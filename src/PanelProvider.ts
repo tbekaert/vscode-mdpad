@@ -2,7 +2,11 @@ import * as vscode from 'vscode'
 import { getWebviewHtml } from './getWebviewHtml'
 import { handleWebviewMessage } from './handleWebviewMessage'
 import type { NotesStorage } from './NotesStorage'
-import type { MdpadCommand, WebviewMessage } from './webview/types'
+import type {
+  MdpadCommand,
+  MdpadSettings,
+  WebviewMessage,
+} from './webview/types'
 
 export class PanelProvider {
   private panel?: vscode.WebviewPanel
@@ -80,6 +84,12 @@ export class PanelProvider {
   postCommand(command: MdpadCommand): void {
     if (this.panel) {
       this.panel.webview.postMessage({ type: 'command', command })
+    }
+  }
+
+  sendSettings(settings: MdpadSettings): void {
+    if (this.panel) {
+      this.panel.webview.postMessage({ type: 'settings', ...settings })
     }
   }
 
