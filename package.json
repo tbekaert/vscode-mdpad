@@ -49,12 +49,29 @@
         "icon": "$(notebook)"
       },
       {
+        "command": "mdpad.previousPage",
+        "title": "Mdpad: Previous Page",
+        "icon": "$(arrow-left)"
+      },
+      {
+        "command": "mdpad.nextPage",
+        "title": "Mdpad: Next Page",
+        "icon": "$(arrow-right)"
+      },
+      {
+        "command": "mdpad.selectPage",
+        "title": "Mdpad: Select Page",
+        "icon": "$(list-flat)"
+      },
+      {
         "command": "mdpad.newPage",
-        "title": "Mdpad: New Page"
+        "title": "Mdpad: New Page",
+        "icon": "$(add)"
       },
       {
         "command": "mdpad.deletePage",
-        "title": "Mdpad: Delete Current Page"
+        "title": "Mdpad: Delete Current Page",
+        "icon": "$(trash)"
       },
       {
         "command": "mdpad.toggleBold",
@@ -69,23 +86,35 @@
         "title": "Mdpad: Toggle Strikethrough"
       }
     ],
-    "keybindings": [
-      {
-        "command": "mdpad.toggleBold",
-        "key": "ctrl+b",
-        "when": "mdpad.focused && !isMac"
-      },
-      {
-        "command": "mdpad.toggleItalic",
-        "key": "ctrl+i",
-        "when": "mdpad.focused && !isMac"
-      },
-      {
-        "command": "mdpad.toggleStrikethrough",
-        "key": "ctrl+shift+x",
-        "when": "mdpad.focused && !isMac"
-      }
-    ]
+    "menus": {
+      "view/title": [
+        {
+          "command": "mdpad.previousPage",
+          "group": "navigation@0",
+          "when": "view == mdpad.notesView"
+        },
+        {
+          "command": "mdpad.nextPage",
+          "group": "navigation@1",
+          "when": "view == mdpad.notesView"
+        },
+        {
+          "command": "mdpad.selectPage",
+          "group": "navigation@2",
+          "when": "view == mdpad.notesView"
+        },
+        {
+          "command": "mdpad.newPage",
+          "group": "navigation@3",
+          "when": "view == mdpad.notesView"
+        },
+        {
+          "command": "mdpad.deletePage",
+          "group": "navigation@4",
+          "when": "view == mdpad.notesView"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "webpack --mode production",

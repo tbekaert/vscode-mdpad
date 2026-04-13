@@ -1,6 +1,5 @@
 import './styles.css'
 import { createEditor, type EditorHandle, wrapSelection } from './editor'
-import { createToolbar, type ToolbarHandle } from './toolbar'
 import type { ExtensionMessage } from './types'
 
 declare function acquireVsCodeApi(): {
@@ -12,8 +11,6 @@ declare function acquireVsCodeApi(): {
 const vscode = acquireVsCodeApi()
 
 let editor: EditorHandle | undefined
-let toolbar: ToolbarHandle | undefined
-let currentActiveId = ''
 let debounceTimer: ReturnType<typeof setTimeout> | undefined
 
 const debounce = (fn: () => void, ms: number): void => {
@@ -25,8 +22,7 @@ const debounce = (fn: () => void, ms: number): void => {
 
 const handleContentChange = (content: string): void => {
   debounce(() => {
-    toolbar?.updateActiveTitle(content)
-    vscode.postMessage({ type: 'updateContent', id: currentActiveId, content })
+    vscode.postMessage({ type: 'updateContent', content })
   }, 500)
 }
 
@@ -35,12 +31,8 @@ const handleOpenLink = (url: string): void => {
 }
 
 const init = (): void => {
-  const toolbarContainer = document.getElementById('toolbar')
   const editorContainer = document.getElementById('editor')
-
-  if (!toolbarContainer || !editorContainer) {
-    return
-  }
+  if (!editorContainer) return
 
   editor = createEditor(
     editorContainer,
@@ -49,24 +41,13 @@ const init = (): void => {
     handleOpenLink,
   )
 
-  toolbar = createToolbar(toolbarContainer, {
-    onNewPage: () => vscode.postMessage({ type: 'newPage' }),
-    onDeletePage: id => vscode.postMessage({ type: 'deletePage', id }),
-    onSwitchPage: id => vscode.postMessage({ type: 'switchPage', id }),
-  })
-
   window.addEventListener(
     'message',
     (event: MessageEvent<ExtensionMessage>) => {
       const message = event.data
       switch (message.type) {
         case 'init': {
-          currentActiveId = message.activeId
-          const activePage = message.pages.find(p => p.id === currentActiveId)
-          if (activePage && editor) {
-            editor.setContent(activePage.content)
-          }
-          toolbar?.updatePages(message.pages, currentActiveId)
+          editor?.setContent(message.content)
           break
         }
         case 'command': {

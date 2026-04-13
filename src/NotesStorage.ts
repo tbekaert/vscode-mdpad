@@ -89,6 +89,26 @@ export class NotesStorage {
     return state
   }
 
+  previousPage(): NotesState {
+    const state = this.getState()
+    const idx = state.pages.findIndex(p => p.id === state.activeId)
+    if (idx > 0) {
+      state.activeId = state.pages[idx - 1].id
+      this.setState(state)
+    }
+    return state
+  }
+
+  nextPage(): NotesState {
+    const state = this.getState()
+    const idx = state.pages.findIndex(p => p.id === state.activeId)
+    if (idx < state.pages.length - 1) {
+      state.activeId = state.pages[idx + 1].id
+      this.setState(state)
+    }
+    return state
+  }
+
   private setState(state: NotesState): void {
     this.cachedState = state
     this.state.update(STORAGE_KEY, state).then(undefined, err => {

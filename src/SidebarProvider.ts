@@ -45,10 +45,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   sendInit(): void {
     if (this.view) {
       const state = this.storage.getState()
+      const page = state.pages.find(p => p.id === state.activeId)
       this.view.webview.postMessage({
         type: 'init',
-        pages: state.pages,
-        activeId: state.activeId,
+        content: page?.content ?? '',
       })
     }
   }

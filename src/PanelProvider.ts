@@ -63,10 +63,10 @@ export class PanelProvider {
   sendInit(): void {
     if (this.panel) {
       const state = this.storage.getState()
+      const page = state.pages.find(p => p.id === state.activeId)
       this.panel.webview.postMessage({
         type: 'init',
-        pages: state.pages,
-        activeId: state.activeId,
+        content: page?.content ?? '',
       })
     }
   }

@@ -27,7 +27,6 @@ export const getWebviewHtml = (
   <title>mdpad</title>
 </head>
 <body>
-  <div id="toolbar"></div>
   <div id="editor"></div>
   <script nonce="${nonce}" src="${scriptUri}"></script>
 </body>
