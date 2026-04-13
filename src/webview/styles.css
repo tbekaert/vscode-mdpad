@@ -67,7 +67,7 @@ body {
    --------------------------------------------------------------------------- */
 
 .mdpad-muted {
-  color: var(--vscode-editorLineNumber-foreground);
+  color: var(--vscode-editorLineNumber-foreground) !important;
 }
 
 /* Headings */
@@ -135,15 +135,17 @@ body {
   color: var(--vscode-editorLineNumber-foreground);
 }
 
-/* Task list */
-.mdpad-task-bracket {
+/* Task list — high specificity to override syntax highlighting */
+.mdpad-task-bracket,
+.mdpad-task-bracket * {
   cursor: pointer;
-  color: var(--mdpad-fg);
+  color: var(--mdpad-fg) !important;
   font-family: var(--vscode-editor-font-family, monospace);
 }
-.mdpad-task-checked {
+.mdpad-task-checked,
+.mdpad-task-checked * {
   text-decoration: line-through;
-  color: var(--vscode-editorLineNumber-foreground);
+  color: var(--vscode-editorLineNumber-foreground) !important;
 }
 
 /* Horizontal rule */
