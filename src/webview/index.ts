@@ -48,6 +48,7 @@ const init = (): void => {
       switch (message.type) {
         case 'init': {
           editor?.setContent(message.content)
+          editor?.view.focus()
           break
         }
         case 'command': {
@@ -68,6 +69,10 @@ const init = (): void => {
       }
     },
   )
+
+  window.addEventListener('focus', () => {
+    editor?.view.focus()
+  })
 
   vscode.postMessage({ type: 'ready' })
 }
