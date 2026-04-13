@@ -193,10 +193,26 @@ export const indentList = (view: EditorView): boolean =>
 export const outdentList = (view: EditorView): boolean =>
   shiftListItem(view, 'out')
 
+export const toggleHeading = (view: EditorView): boolean => {
+  const line = view.state.doc.lineAt(view.state.selection.main.head)
+  const match = line.text.match(/^(#{1,3})\s/)
+  let insert: string
+  if (!match) {
+    insert = `# ${line.text}`
+  } else if (match[1].length < 3) {
+    insert = `#${line.text}`
+  } else {
+    insert = line.text.replace(/^#{1,3}\s/, '')
+  }
+  view.dispatch({ changes: { from: line.from, to: line.to, insert } })
+  return true
+}
+
 const mdKeymap: KeyBinding[] = [
   { key: 'Ctrl-b', run: view => wrapSelection(view, '**') },
   { key: 'Ctrl-i', run: view => wrapSelection(view, '*') },
   { key: 'Ctrl-Shift-x', run: view => wrapSelection(view, '~~') },
+  { key: 'Ctrl-Shift-h', run: toggleHeading },
   { key: 'Tab', run: indentList },
   { key: 'Shift-Tab', run: outdentList },
 ]
