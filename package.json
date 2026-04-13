@@ -4,6 +4,7 @@
   "description": "A lightweight markdown notepad inside VS Code",
   "version": "0.0.1",
   "publisher": "tbekaert",
+  "packageManager": "pnpm@10.29.2",
   "license": "GPL-3.0-or-later",
   "icon": "images/icon.png",
   "repository": {
