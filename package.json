@@ -46,55 +46,78 @@
     "commands": [
       {
         "command": "mdpad.openPanel",
-        "title": "Mdpad: Open as Panel",
+        "title": "Open as Panel",
+        "category": "mdpad",
         "icon": "$(notebook)"
       },
       {
         "command": "mdpad.previousPage",
-        "title": "Mdpad: Previous Page",
+        "title": "Previous Page",
+        "category": "mdpad",
         "icon": "$(arrow-left)"
       },
       {
         "command": "mdpad.nextPage",
-        "title": "Mdpad: Next Page",
+        "title": "Next Page",
+        "category": "mdpad",
         "icon": "$(arrow-right)"
       },
       {
         "command": "mdpad.selectPage",
-        "title": "Mdpad: Select Page",
+        "title": "Select Page",
+        "category": "mdpad",
         "icon": "$(list-flat)"
       },
       {
         "command": "mdpad.newPage",
-        "title": "Mdpad: New Page",
+        "title": "New Page",
+        "category": "mdpad",
         "icon": "$(add)"
       },
       {
         "command": "mdpad.deletePage",
-        "title": "Mdpad: Delete Current Page",
+        "title": "Delete Current Page",
+        "category": "mdpad",
         "icon": "$(trash)"
       },
       {
         "command": "mdpad.switchToGlobal",
-        "title": "Mdpad: Switch to Global Notes",
+        "title": "Switch to Global Notes",
+        "category": "mdpad",
         "icon": "$(globe)"
       },
       {
         "command": "mdpad.switchToWorkspace",
-        "title": "Mdpad: Switch to Workspace Notes",
+        "title": "Switch to Workspace Notes",
+        "category": "mdpad",
         "icon": "$(root-folder)"
       },
       {
+        "command": "mdpad.exportPage",
+        "title": "Export Current Page",
+        "category": "mdpad",
+        "icon": "$(export)"
+      },
+      {
+        "command": "mdpad.openSettings",
+        "title": "Open Settings",
+        "category": "mdpad",
+        "icon": "$(gear)"
+      },
+      {
         "command": "mdpad.toggleBold",
-        "title": "Mdpad: Toggle Bold"
+        "title": "Toggle Bold",
+        "category": "mdpad"
       },
       {
         "command": "mdpad.toggleItalic",
-        "title": "Mdpad: Toggle Italic"
+        "title": "Toggle Italic",
+        "category": "mdpad"
       },
       {
         "command": "mdpad.toggleStrikethrough",
-        "title": "Mdpad: Toggle Strikethrough"
+        "title": "Toggle Strikethrough",
+        "category": "mdpad"
       }
     ],
     "menus": {
@@ -115,11 +138,6 @@
           "when": "view == mdpad.notesView"
         },
         {
-          "command": "mdpad.deletePage",
-          "group": "navigation@3",
-          "when": "view == mdpad.notesView"
-        },
-        {
           "command": "mdpad.newPage",
           "group": "navigation@4",
           "when": "view == mdpad.notesView"
@@ -133,6 +151,26 @@
           "command": "mdpad.switchToWorkspace",
           "group": "navigation@5",
           "when": "view == mdpad.notesView && mdpad.scope == global"
+        },
+        {
+          "command": "mdpad.openPanel",
+          "group": "2_mdpad@1",
+          "when": "view == mdpad.notesView"
+        },
+        {
+          "command": "mdpad.exportPage",
+          "group": "2_mdpad@2",
+          "when": "view == mdpad.notesView"
+        },
+        {
+          "command": "mdpad.deletePage",
+          "group": "3_mdpad@1",
+          "when": "view == mdpad.notesView"
+        },
+        {
+          "command": "mdpad.openSettings",
+          "group": "4_mdpad@1",
+          "when": "view == mdpad.notesView"
         }
       ]
     },
@@ -163,6 +201,11 @@
           "type": "boolean",
           "default": true,
           "description": "Wrap long lines."
+        },
+        "mdpad.syncGlobalNotes": {
+          "type": "boolean",
+          "default": false,
+          "description": "Sync global notes across devices via VS Code Settings Sync. Opt-in: synced data cannot be removed from the remote once synced."
         }
       }
     }
