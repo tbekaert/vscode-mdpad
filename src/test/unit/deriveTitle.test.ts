@@ -1,6 +1,6 @@
 import assert from 'node:assert'
 import { describe, it } from 'mocha'
-import { deriveTitle } from '../../webview/toolbar'
+import { deriveTitle } from '../../deriveTitle'
 
 describe('deriveTitle', () => {
   it('returns first # heading text', () => {

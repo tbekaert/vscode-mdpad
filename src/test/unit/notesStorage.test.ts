@@ -124,4 +124,39 @@ describe('NotesStorage', () => {
       assert.strictEqual(storage.getState().activeId, originalActive)
     })
   })
+
+  describe('previousPage', () => {
+    it('switches to previous page', () => {
+      storage.getState()
+      storage.newPage()
+      const state = storage.getState()
+      const secondId = state.activeId
+      storage.previousPage()
+      assert.notStrictEqual(storage.getState().activeId, secondId)
+    })
+
+    it('does nothing on first page', () => {
+      const state = storage.getState()
+      storage.previousPage()
+      assert.strictEqual(storage.getState().activeId, state.activeId)
+    })
+  })
+
+  describe('nextPage', () => {
+    it('switches to next page', () => {
+      storage.getState()
+      storage.newPage()
+      const firstId = storage.getState().pages[0].id
+      storage.switchPage(firstId)
+      storage.nextPage()
+      assert.notStrictEqual(storage.getState().activeId, firstId)
+    })
+
+    it('does nothing on last page', () => {
+      const state = storage.getState()
+      const activeId = state.activeId
+      storage.nextPage()
+      assert.strictEqual(storage.getState().activeId, activeId)
+    })
+  })
 })
