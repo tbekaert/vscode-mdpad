@@ -11,6 +11,10 @@
     "url": "https://github.com/tbekaert/vscode-mdpad",
     "type": "git"
   },
+  "homepage": "https://github.com/tbekaert/vscode-mdpad#readme",
+  "bugs": {
+    "url": "https://github.com/tbekaert/vscode-mdpad/issues"
+  },
   "keywords": [
     "markdown",
     "notes",
@@ -26,7 +30,7 @@
     "workspace"
   ],
   "categories": [
-    "Other"
+    "Notebooks"
   ],
   "galleryBanner": {
     "color": "#1e1e1e",
