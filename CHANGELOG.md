@@ -1,5 +1,11 @@
 # mdpad
 
+## 0.1.1
+
+### Patch Changes
+
+- 4490a95: Fix release workflow: detect version bump instead of relying on changesets action output to trigger publishing
+
 ## 0.1.0
 
 ### Minor Changes
