@@ -27,6 +27,17 @@ Markdown characters (`#`, `**`, `*`, `` ` ``, `~~`) stay visible but dimmed. Con
 
 Create, switch, and delete note pages from the toolbar dropdown. Page titles are derived automatically from the first heading or first line of content.
 
+### Lists
+
+- Bullet and numbered list markers are styled with muted syntax
+- **Tab / Shift+Tab** to indent and outdent list items
+- Unordered lists automatically cycle markers by depth: `-` → `*` → `+`
+- Ordered lists renumber automatically when indenting or outdenting
+
+### Code blocks
+
+Fenced code blocks get syntax highlighting for 19 languages including JavaScript, TypeScript, Python, JSON, HTML, CSS, SQL, Rust, Go, Java, C/C++, and more. Typing ` ``` ` auto-inserts the closing fence.
+
 ### Keyboard shortcuts
 
 | Action        | Mac            | Windows/Linux  |
@@ -34,11 +45,14 @@ Create, switch, and delete note pages from the toolbar dropdown. Page titles are
 | Bold          | `Ctrl+B`       | `Ctrl+B`       |
 | Italic        | `Ctrl+I`       | `Ctrl+I`       |
 | Strikethrough | `Ctrl+Shift+X` | `Ctrl+Shift+X` |
+| Indent list   | `Tab`          | `Tab`          |
+| Outdent list  | `Shift+Tab`    | `Shift+Tab`    |
 
 ### Interactive elements
 
 - **Checkboxes** — click `[ ]` or `[x]` to toggle task list items
-- **Links** — `Cmd+click` (Mac) or `Ctrl+click` (Windows/Linux) to open URLs
+- **Links** — `Cmd+click` (Mac) or `Ctrl+click` (Windows/Linux) to open URLs or file paths in the editor
+- **Paste-as-link** — select text and paste a URL or file path to auto-wrap as `[text](url)`
 - **Tables** — columns align automatically as you type
 
 ### Floating panel
