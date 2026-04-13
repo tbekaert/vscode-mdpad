@@ -1,5 +1,11 @@
 # mdpad
 
+## 0.1.3
+
+### Patch Changes
+
+- 7295d8b: Run Open VSX and VS Code Marketplace publish jobs in parallel so one failure doesn't block the other
+
 ## 0.1.2
 
 ### Patch Changes
