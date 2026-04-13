@@ -14,7 +14,11 @@ export type WebviewMessage =
   | { type: 'updateContent'; content: string }
   | { type: 'openLink'; url: string }
 
-export type MdpadCommand = 'toggleBold' | 'toggleItalic' | 'toggleStrikethrough'
+export type MdpadCommand =
+  | 'toggleBold'
+  | 'toggleItalic'
+  | 'toggleStrikethrough'
+  | 'openSearch'
 
 export interface MdpadSettings {
   fontFamily: string
