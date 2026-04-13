@@ -7,6 +7,7 @@ import {
   ViewPlugin,
   type ViewUpdate,
 } from '@codemirror/view'
+import { olPattern, ulPattern } from './listPatterns'
 
 // ---------------------------------------------------------------------------
 // Decoration constants
@@ -169,6 +170,8 @@ const decorateBlockquote = (
   }
 }
 
+const listBulletMark = Decoration.mark({ class: 'mdpad-list-bullet' })
+
 const decorateListItem = (
   decorations: Range<Decoration>[],
   doc: Text,
@@ -199,6 +202,23 @@ const decorateListItem = (
         ),
       )
     }
+    return
+  }
+
+  const ulMatch = line.text.match(ulPattern)
+  if (ulMatch) {
+    const markerStart = line.from + ulMatch[1].length
+    const markerEnd = markerStart + ulMatch[2].length
+    decorations.push(listBulletMark.range(markerStart, markerEnd))
+    return
+  }
+
+  const olMatch = line.text.match(olPattern)
+  if (olMatch) {
+    const markerStart = line.from + olMatch[1].length
+    const markerEnd = markerStart + olMatch[2].length + olMatch[3].length
+    decorations.push(muted.range(markerStart, markerEnd))
+    return
   }
 }
 
@@ -281,7 +301,6 @@ const buildDecorations = (view: EditorView): DecorationSet => {
   const decorations: Range<Decoration>[] = []
   const tree = syntaxTree(view.state)
   const doc = view.state.doc
-
   tree.iterate({
     enter(node) {
       const { from, to, name } = node

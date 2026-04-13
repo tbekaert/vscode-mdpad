@@ -72,10 +72,127 @@ export const wrapSelection = (view: EditorView, marker: string): boolean => {
   return true
 }
 
+import {
+  LIST_INDENT,
+  LIST_INDENT_SIZE,
+  listPattern,
+  olPattern,
+  ulMarkers,
+} from './listPatterns'
+
+const renumberOlSiblings = (
+  doc: import('@codemirror/state').Text,
+  startLineNum: number,
+  targetIndent: string,
+  startNum: number,
+): { from: number; to: number; insert: string }[] => {
+  const changes: { from: number; to: number; insert: string }[] = []
+  let num = startNum
+  for (let i = startLineNum; i <= doc.lines; i++) {
+    const l = doc.line(i)
+    const m = l.text.match(olPattern)
+    if (!m) break
+    const [, indent] = m
+    if (indent.length < targetIndent.length) break
+    if (indent.length > targetIndent.length) continue
+    const numStart = l.from + indent.length
+    const numEnd = numStart + m[2].length
+    changes.push({ from: numStart, to: numEnd, insert: String(num) })
+    num++
+  }
+  return changes
+}
+
+const findNextOlNumber = (
+  doc: import('@codemirror/state').Text,
+  beforeLineNum: number,
+  targetIndent: string,
+): number => {
+  for (let i = beforeLineNum - 1; i >= 1; i--) {
+    const l = doc.line(i)
+    const m = l.text.match(olPattern)
+    if (!m) break
+    const [, indent] = m
+    if (indent.length < targetIndent.length) break
+    if (indent.length === targetIndent.length) {
+      return Number.parseInt(m[2], 10) + 1
+    }
+  }
+  return 1
+}
+
+const shiftListItem = (view: EditorView, direction: 'in' | 'out'): boolean => {
+  const line = view.state.doc.lineAt(view.state.selection.main.head)
+  const match = line.text.match(listPattern)
+  if (!match) return false
+
+  const [, indent, marker] = match
+
+  if (direction === 'out' && indent.length === 0) return true
+
+  const newIndent =
+    direction === 'in'
+      ? `${indent}${LIST_INDENT}`
+      : indent.slice(Math.min(LIST_INDENT_SIZE, indent.length))
+  const depth = newIndent.length / LIST_INDENT_SIZE
+  const isOl = !ulMarkers.includes(marker)
+
+  let newMarker = marker
+  let newNum = 1
+  if (!isOl) {
+    newMarker = ulMarkers[depth % ulMarkers.length]
+  } else {
+    const suffix = marker.slice(-1)
+    newNum = findNextOlNumber(view.state.doc, line.number, newIndent)
+    newMarker = `${newNum}${suffix}`
+  }
+
+  const markerStart = line.from + indent.length
+  const markerEnd = markerStart + marker.length
+
+  const changes: { from: number; to: number; insert: string }[] = [
+    { from: line.from, to: markerStart, insert: newIndent },
+    { from: markerStart, to: markerEnd, insert: newMarker },
+  ]
+
+  if (isOl && line.number + 1 <= view.state.doc.lines) {
+    const originalStartNum =
+      direction === 'in'
+        ? Number.parseInt(marker.match(/\d+/)?.[0] ?? '1', 10)
+        : 1
+    changes.push(
+      ...renumberOlSiblings(
+        view.state.doc,
+        line.number + 1,
+        indent,
+        originalStartNum,
+      ),
+    )
+    changes.push(
+      ...renumberOlSiblings(
+        view.state.doc,
+        line.number + 1,
+        newIndent,
+        newNum + 1,
+      ),
+    )
+  }
+
+  view.dispatch({ changes })
+  return true
+}
+
+export const indentList = (view: EditorView): boolean =>
+  shiftListItem(view, 'in')
+export const outdentList = (view: EditorView): boolean =>
+  shiftListItem(view, 'out')
+
 const mdKeymap: KeyBinding[] = [
   { key: 'Ctrl-b', run: view => wrapSelection(view, '**') },
   { key: 'Ctrl-i', run: view => wrapSelection(view, '*') },
   { key: 'Ctrl-Shift-x', run: view => wrapSelection(view, '~~') },
+  { key: 'Tab', run: indentList },
+  { key: 'Shift-Tab', run: outdentList },
 ]
 
 const vsCodeTheme = EditorView.theme({
