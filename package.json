@@ -75,6 +75,16 @@
         "icon": "$(trash)"
       },
       {
+        "command": "mdpad.switchToGlobal",
+        "title": "Mdpad: Switch to Global Notes",
+        "icon": "$(globe)"
+      },
+      {
+        "command": "mdpad.switchToWorkspace",
+        "title": "Mdpad: Switch to Workspace Notes",
+        "icon": "$(root-folder)"
+      },
+      {
         "command": "mdpad.toggleBold",
         "title": "Mdpad: Toggle Bold"
       },
@@ -113,6 +123,16 @@
           "command": "mdpad.newPage",
           "group": "navigation@4",
           "when": "view == mdpad.notesView"
+        },
+        {
+          "command": "mdpad.switchToGlobal",
+          "group": "navigation@5",
+          "when": "view == mdpad.notesView && mdpad.scope == workspace"
+        },
+        {
+          "command": "mdpad.switchToWorkspace",
+          "group": "navigation@5",
+          "when": "view == mdpad.notesView && mdpad.scope == global"
         }
       ]
     }

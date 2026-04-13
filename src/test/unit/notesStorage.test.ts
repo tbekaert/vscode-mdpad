@@ -159,4 +159,50 @@ describe('NotesStorage', () => {
       assert.strictEqual(storage.getState().activeId, activeId)
     })
   })
+
+  describe('dual instances (global notes pattern)', () => {
+    it('two instances on separate mementos are fully independent', () => {
+      const workspaceMemento = new MockMemento() as never
+      const globalMemento = new MockMemento() as never
+      const workspaceStorage = new NotesStorage(workspaceMemento)
+      const globalStorage = new NotesStorage(globalMemento)
+
+      // Both start with one welcome page
+      assert.strictEqual(workspaceStorage.getState().pages.length, 1)
+      assert.strictEqual(globalStorage.getState().pages.length, 1)
+
+      // Adding pages to one doesn't affect the other
+      workspaceStorage.newPage()
+      workspaceStorage.newPage()
+      assert.strictEqual(workspaceStorage.getState().pages.length, 3)
+      assert.strictEqual(globalStorage.getState().pages.length, 1)
+
+      // Updating content in one doesn't affect the other
+      const wsPageId = workspaceStorage.getState().pages[0].id
+      workspaceStorage.updateContent(wsPageId, 'workspace note')
+      assert.strictEqual(
+        workspaceStorage.getState().pages[0].content,
+        'workspace note',
+      )
+      assert.ok(globalStorage.getState().pages[0].content.includes('Welcome'))
+    })
+
+    it('each instance remembers its own active page', () => {
+      const workspaceMemento = new MockMemento() as never
+      const globalMemento = new MockMemento() as never
+      const workspaceStorage = new NotesStorage(workspaceMemento)
+      const globalStorage = new NotesStorage(globalMemento)
+
+      workspaceStorage.newPage()
+      const wsActiveId = workspaceStorage.getState().activeId
+
+      globalStorage.newPage()
+      const globalActiveId = globalStorage.getState().activeId
+
+      // Each has its own active page
+      assert.strictEqual(workspaceStorage.getState().activeId, wsActiveId)
+      assert.strictEqual(globalStorage.getState().activeId, globalActiveId)
+      assert.notStrictEqual(wsActiveId, globalActiveId)
+    })
+  })
 })

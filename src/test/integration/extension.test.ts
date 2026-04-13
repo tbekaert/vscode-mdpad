@@ -16,6 +16,8 @@ suite('Extension', () => {
     'mdpad.previousPage',
     'mdpad.nextPage',
     'mdpad.selectPage',
+    'mdpad.switchToGlobal',
+    'mdpad.switchToWorkspace',
     'mdpad.toggleBold',
     'mdpad.toggleItalic',
     'mdpad.toggleStrikethrough',

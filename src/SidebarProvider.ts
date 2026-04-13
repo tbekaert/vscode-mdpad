@@ -11,7 +11,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
   constructor(
     private readonly extensionUri: vscode.Uri,
-    private readonly storage: NotesStorage,
+    private readonly getStorage: () => NotesStorage,
   ) {}
 
   resolveWebviewView(webviewView: vscode.WebviewView): void {
@@ -28,7 +28,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     )
 
     webviewView.webview.onDidReceiveMessage((message: WebviewMessage) => {
-      handleWebviewMessage(message, this.storage, () => this.sendInit())
+      handleWebviewMessage(message, this.getStorage(), () => this.sendInit())
     })
 
     webviewView.onDidChangeVisibility(() => {
@@ -44,12 +44,18 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
   sendInit(): void {
     if (this.view) {
-      const state = this.storage.getState()
+      const state = this.getStorage().getState()
       const page = state.pages.find(p => p.id === state.activeId)
       this.view.webview.postMessage({
         type: 'init',
         content: page?.content ?? '',
       })
+    }
+  }
+
+  setTitle(title: string): void {
+    if (this.view) {
+      this.view.title = title
     }
   }
 
