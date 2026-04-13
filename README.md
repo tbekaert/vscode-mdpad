@@ -15,9 +15,13 @@ A lightweight markdown notepad inside VS Code. Type markdown and see it styled l
 2. Open the **Explorer sidebar** — mdpad appears as a panel
 3. Start typing markdown
 
-That's it. Your notes persist across restarts, per workspace.
+That's it. Your notes persist across restarts, per workspace. Toggle to **Global** scope for notes that follow you across all workspaces.
 
 ## Features
+
+### Workspace & Global notes
+
+Notes default to workspace scope — tied to the current project. Click the scope toggle in the title bar to switch to global notes, accessible from any workspace. The page picker lists notes from both scopes.
 
 ### Muted-syntax editing
 

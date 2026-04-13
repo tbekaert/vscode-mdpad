@@ -9,7 +9,7 @@ export class PanelProvider {
 
   constructor(
     private readonly extensionUri: vscode.Uri,
-    private readonly storage: NotesStorage,
+    private readonly getStorage: () => NotesStorage,
     private readonly onDidDispose: () => void,
   ) {}
 
@@ -37,7 +37,7 @@ export class PanelProvider {
 
     const messageDisposable = this.panel.webview.onDidReceiveMessage(
       (message: WebviewMessage) => {
-        handleWebviewMessage(message, this.storage, () => this.sendInit())
+        handleWebviewMessage(message, this.getStorage(), () => this.sendInit())
       },
     )
 
@@ -62,12 +62,18 @@ export class PanelProvider {
 
   sendInit(): void {
     if (this.panel) {
-      const state = this.storage.getState()
+      const state = this.getStorage().getState()
       const page = state.pages.find(p => p.id === state.activeId)
       this.panel.webview.postMessage({
         type: 'init',
         content: page?.content ?? '',
       })
+    }
+  }
+
+  setTitle(title: string): void {
+    if (this.panel) {
+      this.panel.title = title
     }
   }
 

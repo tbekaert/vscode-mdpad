@@ -32,10 +32,10 @@ pnpm changeset status  # Show pending changesets
 Two webpack bundles from one config file:
 
 **Extension host** (`dist/extension.js`, target: node):
-- `src/extension.ts` — Entry point. Commands: `openPanel`, `newPage`, `deletePage`, `toggleBold/Italic/Strikethrough`.
-- `src/SidebarProvider.ts` — `WebviewViewProvider` for the Explorer sidebar.
-- `src/PanelProvider.ts` — Singleton `WebviewPanel` for floating editor. Exclusive mode: only sidebar or panel active at a time.
-- `src/NotesStorage.ts` — CRUD over `workspaceState`. Cached reads. Stores `{ pages: Page[], activeId }`.
+- `src/extension.ts` — Entry point. Dual storage (workspace + global), scope routing, commands: `openPanel`, `newPage`, `deletePage`, `switchToGlobal/Workspace`, `toggleBold/Italic/Strikethrough`.
+- `src/SidebarProvider.ts` — `WebviewViewProvider` for the Explorer sidebar. Accepts storage getter for scope switching.
+- `src/PanelProvider.ts` — Singleton `WebviewPanel` for floating editor. Exclusive mode: only sidebar or panel active at a time. Accepts storage getter for scope switching.
+- `src/NotesStorage.ts` — CRUD over any `vscode.Memento` (workspaceState or globalState). Cached reads. Stores `{ pages: Page[], activeId }`.
 - `src/handleWebviewMessage.ts` — Shared message handler used by both providers.
 - `src/getWebviewHtml.ts` — HTML generation with nonce-based CSP.
 
