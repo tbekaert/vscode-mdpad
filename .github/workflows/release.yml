@@ -57,14 +57,17 @@ jobs:
 
       - name: Package extension
         if: steps.version.outputs.bumped == 'true'
-        run: pnpm run publish:extension
+        id: package
+        run: |
+          pnpm run publish:extension
+          echo "vsix=$(ls *.vsix)" >> "$GITHUB_OUTPUT"
 
       - name: Publish to Open VSX
         if: steps.version.outputs.bumped == 'true'
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           pat: ${{ secrets.OPEN_VSX_TOKEN }}
-          extensionFile: "*.vsix"
+          extensionFile: ${{ steps.package.outputs.vsix }}
           skipDuplicate: true
 
       - name: Publish to VS Code Marketplace
@@ -73,5 +76,5 @@ jobs:
         with:
           pat: ${{ secrets.VSCE_PAT }}
           registryUrl: https://marketplace.visualstudio.com
-          extensionFile: "*.vsix"
+          extensionFile: ${{ steps.package.outputs.vsix }}
           skipDuplicate: true
