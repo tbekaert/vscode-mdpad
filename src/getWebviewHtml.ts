@@ -1,17 +1,22 @@
-import * as vscode from 'vscode';
+import * as vscode from 'vscode'
 
 const getNonce = (): string => {
-  let text = '';
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let text = ''
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
   for (let i = 0; i < 32; i++) {
-    text += chars.charAt(Math.floor(Math.random() * chars.length));
+    text += chars.charAt(Math.floor(Math.random() * chars.length))
   }
-  return text;
-};
+  return text
+}
 
-export const getWebviewHtml = (webview: vscode.Webview, extensionUri: vscode.Uri): string => {
-  const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, 'dist', 'webview.js'));
-  const nonce = getNonce();
+export const getWebviewHtml = (
+  webview: vscode.Webview,
+  extensionUri: vscode.Uri,
+): string => {
+  const scriptUri = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, 'dist', 'webview.js'),
+  )
+  const nonce = getNonce()
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -26,5 +31,5 @@ export const getWebviewHtml = (webview: vscode.Webview, extensionUri: vscode.Uri
   <div id="editor"></div>
   <script nonce="${nonce}" src="${scriptUri}"></script>
 </body>
-</html>`;
-};
+</html>`
+}

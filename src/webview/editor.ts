@@ -1,46 +1,66 @@
-import { EditorView, keymap, drawSelection, placeholder, KeyBinding } from '@codemirror/view';
-import { EditorState } from '@codemirror/state';
-import { markdown } from '@codemirror/lang-markdown';
-import { GFM } from '@lezer/markdown';
-import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
-import { markdownDecorations, attachClickHandlers } from './decorations';
-import { tableAutoFormat } from './tableFormatter';
+import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
+import { markdown } from '@codemirror/lang-markdown'
+import { EditorState } from '@codemirror/state'
+import {
+  drawSelection,
+  EditorView,
+  type KeyBinding,
+  keymap,
+  placeholder,
+} from '@codemirror/view'
+import { GFM } from '@lezer/markdown'
+import { attachClickHandlers, markdownDecorations } from './decorations'
+import { tableAutoFormat } from './tableFormatter'
 
 export const wrapSelection = (view: EditorView, marker: string): boolean => {
-  const { from, to } = view.state.selection.main;
-  const selected = view.state.doc.sliceString(from, to);
+  const { from, to } = view.state.selection.main
+  const selected = view.state.doc.sliceString(from, to)
 
-  if (selected.startsWith(marker) && selected.endsWith(marker) && selected.length > marker.length * 2) {
+  if (
+    selected.startsWith(marker) &&
+    selected.endsWith(marker) &&
+    selected.length > marker.length * 2
+  ) {
     view.dispatch({
-      changes: { from, to, insert: selected.slice(marker.length, -marker.length) },
-    });
-    return true;
+      changes: {
+        from,
+        to,
+        insert: selected.slice(marker.length, -marker.length),
+      },
+    })
+    return true
   }
 
-  const before = view.state.doc.sliceString(Math.max(0, from - marker.length), from);
-  const after = view.state.doc.sliceString(to, Math.min(view.state.doc.length, to + marker.length));
+  const before = view.state.doc.sliceString(
+    Math.max(0, from - marker.length),
+    from,
+  )
+  const after = view.state.doc.sliceString(
+    to,
+    Math.min(view.state.doc.length, to + marker.length),
+  )
   if (before === marker && after === marker) {
     view.dispatch({
       changes: [
         { from: from - marker.length, to: from, insert: '' },
         { from: to, to: to + marker.length, insert: '' },
       ],
-    });
-    return true;
+    })
+    return true
   }
 
   view.dispatch({
     changes: { from, to, insert: `${marker}${selected}${marker}` },
     selection: { anchor: from + marker.length, head: to + marker.length },
-  });
-  return true;
-};
+  })
+  return true
+}
 
 const mdKeymap: KeyBinding[] = [
-  { key: 'Ctrl-b', run: (view) => wrapSelection(view, '**') },
-  { key: 'Ctrl-i', run: (view) => wrapSelection(view, '*') },
-  { key: 'Ctrl-Shift-x', run: (view) => wrapSelection(view, '~~') },
-];
+  { key: 'Ctrl-b', run: view => wrapSelection(view, '**') },
+  { key: 'Ctrl-i', run: view => wrapSelection(view, '*') },
+  { key: 'Ctrl-Shift-x', run: view => wrapSelection(view, '~~') },
+]
 
 const vsCodeTheme = EditorView.theme({
   '&': {
@@ -63,11 +83,11 @@ const vsCodeTheme = EditorView.theme({
   '&.cm-focused': {
     outline: 'none',
   },
-});
+})
 
 export interface EditorHandle {
-  view: EditorView;
-  setContent: (content: string) => void;
+  view: EditorView
+  setContent: (content: string) => void
 }
 
 export const createEditor = (
@@ -76,11 +96,11 @@ export const createEditor = (
   onContentChange: (content: string) => void,
   onOpenLink: (url: string) => void,
 ): EditorHandle => {
-  const updateListener = EditorView.updateListener.of((update) => {
+  const updateListener = EditorView.updateListener.of(update => {
     if (update.docChanged) {
-      onContentChange(update.state.doc.toString());
+      onContentChange(update.state.doc.toString())
     }
-  });
+  })
 
   const view = new EditorView({
     state: EditorState.create({
@@ -98,18 +118,18 @@ export const createEditor = (
       ],
     }),
     parent,
-  });
+  })
 
-  attachClickHandlers(view, onOpenLink);
+  attachClickHandlers(view, onOpenLink)
 
   const setContent = (content: string): void => {
-    const current = view.state.doc.toString();
+    const current = view.state.doc.toString()
     if (current !== content) {
       view.dispatch({
         changes: { from: 0, to: current.length, insert: content },
-      });
+      })
     }
-  };
+  }
 
-  return { view, setContent };
-};
+  return { view, setContent }
+}

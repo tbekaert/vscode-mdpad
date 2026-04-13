@@ -13,7 +13,8 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   overflow: hidden;
   display: flex;
@@ -58,7 +59,7 @@ html, body {
 }
 
 #editor .cm-editor .cm-selectionBackground {
-  background: var(--mdpad-selection) !important;
+  background: var(--mdpad-selection);
 }
 
 #editor .cm-editor .cm-gutters {
@@ -106,27 +107,49 @@ html, body {
    --------------------------------------------------------------------------- */
 
 .mdpad-muted {
-  color: var(--vscode-editorLineNumber-foreground) !important;
+  color: var(--vscode-editorLineNumber-foreground);
 }
 
 /* Headings */
-.mdpad-heading { font-weight: 600; line-height: 1.25; }
-.mdpad-heading-1 { font-size: 2em; }
-.mdpad-heading-2 { font-size: 1.5em; }
-.mdpad-heading-3 { font-size: 1.25em; }
-.mdpad-heading-4 { font-size: 1em; }
-.mdpad-heading-5 { font-size: 0.875em; }
-.mdpad-heading-6 { font-size: 0.85em; color: var(--vscode-editorLineNumber-foreground); }
+.mdpad-heading {
+  font-weight: 600;
+  line-height: 1.25;
+}
+.mdpad-heading-1 {
+  font-size: 2em;
+}
+.mdpad-heading-2 {
+  font-size: 1.5em;
+}
+.mdpad-heading-3 {
+  font-size: 1.25em;
+}
+.mdpad-heading-4 {
+  font-size: 1em;
+}
+.mdpad-heading-5 {
+  font-size: 0.875em;
+}
+.mdpad-heading-6 {
+  font-size: 0.85em;
+  color: var(--vscode-editorLineNumber-foreground);
+}
 .mdpad-heading-border {
-  border-bottom: 1px solid var(--mdpad-border) !important;
-  padding-bottom: 0.3em !important;
-  margin-bottom: 0.3em !important;
+  border-bottom: 1px solid var(--mdpad-border);
+  padding-bottom: 0.3em;
+  margin-bottom: 0.3em;
 }
 
 /* Inline */
-.mdpad-bold { font-weight: 600; }
-.mdpad-italic { font-style: italic; }
-.mdpad-strike { text-decoration: line-through; }
+.mdpad-bold {
+  font-weight: 600;
+}
+.mdpad-italic {
+  font-style: italic;
+}
+.mdpad-strike {
+  text-decoration: line-through;
+}
 .mdpad-inline-code {
   font-family: var(--vscode-editor-font-family, monospace);
   font-size: 85%;
@@ -143,14 +166,14 @@ html, body {
 
 /* Blockquote */
 .mdpad-blockquote {
-  border-left: 4px solid var(--mdpad-border) !important;
-  padding-left: 16px !important;
+  border-left: 4px solid var(--mdpad-border);
+  padding-left: 16px;
 }
 
 /* Task list */
 .mdpad-task-bracket {
   cursor: pointer;
-  color: var(--mdpad-fg) !important;
+  color: var(--mdpad-fg);
   font-family: var(--vscode-editor-font-family, monospace);
 }
 .mdpad-task-checked {
@@ -160,24 +183,25 @@ html, body {
 
 /* Horizontal rule */
 .mdpad-hr {
-  text-decoration: line-through var(--mdpad-border) !important;
+  text-decoration: line-through var(--mdpad-border);
 }
 
 /* Fenced code */
-.mdpad-code-line, .mdpad-code-line * {
-  font-family: var(--vscode-editor-font-family, monospace) !important;
-  font-size: 90% !important;
+.mdpad-code-line,
+.mdpad-code-line * {
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 90%;
 }
 .mdpad-code-line {
-  background: rgba(128, 128, 128, 0.06) !important;
+  background: rgba(128, 128, 128, 0.06);
 }
 
 /* Tables */
 .mdpad-table-line {
-  font-family: var(--vscode-editor-font-family, monospace) !important;
-  font-size: 90% !important;
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 90%;
 }
 .mdpad-table-header {
-  font-weight: 600 !important;
-  background: rgba(128, 128, 128, 0.06) !important;
+  font-weight: 600;
+  background: rgba(128, 128, 128, 0.06);
 }

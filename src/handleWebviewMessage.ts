@@ -1,6 +1,6 @@
-import * as vscode from 'vscode';
-import { NotesStorage } from './NotesStorage';
-import type { WebviewMessage } from './webview/types';
+import * as vscode from 'vscode'
+import type { NotesStorage } from './NotesStorage'
+import type { WebviewMessage } from './webview/types'
 
 export const handleWebviewMessage = (
   message: WebviewMessage,
@@ -9,29 +9,29 @@ export const handleWebviewMessage = (
 ): void => {
   switch (message.type) {
     case 'ready':
-      sendInit();
-      break;
+      sendInit()
+      break
     case 'updateContent':
-      storage.updateContent(message.id, message.content);
-      break;
+      storage.updateContent(message.id, message.content)
+      break
     case 'newPage':
-      storage.newPage();
-      sendInit();
-      break;
+      storage.newPage()
+      sendInit()
+      break
     case 'deletePage':
-      storage.deletePage(message.id);
-      sendInit();
-      break;
+      storage.deletePage(message.id)
+      sendInit()
+      break
     case 'switchPage':
-      storage.switchPage(message.id);
-      sendInit();
-      break;
+      storage.switchPage(message.id)
+      sendInit()
+      break
     case 'openLink': {
-      const uri = vscode.Uri.parse(message.url);
+      const uri = vscode.Uri.parse(message.url)
       if (['http', 'https', 'file'].includes(uri.scheme)) {
-        vscode.env.openExternal(uri);
+        vscode.env.openExternal(uri)
       }
-      break;
+      break
     }
   }
-};
+}

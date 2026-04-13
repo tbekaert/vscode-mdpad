@@ -16,7 +16,8 @@ pnpm webpack          # Build both bundles (development mode)
 pnpm webpack-dev      # Build + watch mode
 
 # Quality
-pnpm lint             # ESLint on src/**/*.ts
+pnpm lint             # Biome check on src/
+pnpm format           # Biome auto-fix on src/
 
 # Test in VS Code
 # Press F5 — launches extension host with the "watch" build task
@@ -60,5 +61,5 @@ Two webpack bundles from one config file:
 
 ## Conventions
 
-- ESLint with Airbnb base + Prettier (120 char lines, 2-space indent).
+- Biome for linting and formatting (via `@bekaert-dev/biome-config` shared preset).
 - License: GPL-3.0-or-later.
