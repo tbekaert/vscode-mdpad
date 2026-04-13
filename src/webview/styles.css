@@ -62,6 +62,87 @@ body {
   outline: none;
 }
 
+/* Search panel */
+.cm-editor .cm-panels {
+  background: var(--vscode-editorWidget-background, var(--mdpad-bg));
+  border-bottom: 1px solid var(--mdpad-border);
+}
+.cm-editor .cm-search {
+  font-family: var(--vscode-font-family, sans-serif);
+  font-size: var(--vscode-font-size, 13px);
+  padding: 6px 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.cm-editor .cm-search br {
+  display: none;
+}
+.cm-editor .cm-search .cm-textfield {
+  background: var(--vscode-input-background, rgba(255, 255, 255, 0.1));
+  color: var(--mdpad-fg);
+  border: 1px solid var(--mdpad-border);
+  border-radius: 3px;
+  padding: 3px 8px;
+  font-size: inherit;
+  flex: 1;
+  min-width: 100px;
+}
+.cm-editor .cm-search .cm-textfield:focus {
+  border-color: var(--vscode-focusBorder, #007fd4);
+  outline: none;
+}
+.cm-editor .cm-search .cm-button {
+  background: var(
+    --vscode-button-secondaryBackground,
+    rgba(255, 255, 255, 0.1)
+  );
+  color: var(--mdpad-fg);
+  border: 1px solid var(--mdpad-border);
+  border-radius: 3px;
+  padding: 3px 8px;
+  font-size: inherit;
+  cursor: pointer;
+}
+.cm-editor .cm-search .cm-button:hover {
+  background: var(
+    --vscode-button-secondaryHoverBackground,
+    rgba(255, 255, 255, 0.15)
+  );
+}
+.cm-editor .cm-search .cm-button[name="close"] {
+  background: none;
+  border: none;
+  padding: 3px 6px;
+  opacity: 0.7;
+}
+.cm-editor .cm-search .cm-button[name="close"]:hover {
+  opacity: 1;
+}
+/* Hide everything except search input, next, prev */
+.cm-editor .cm-search .cm-textfield[name="replace"],
+.cm-editor .cm-search .cm-button[name="replace"],
+.cm-editor .cm-search .cm-button[name="replaceAll"],
+.cm-editor .cm-search .cm-button[name="select"],
+.cm-editor .cm-search .cm-button[name="close"],
+.cm-editor .cm-search label {
+  display: none;
+}
+
+/* Search highlights */
+.cm-editor .cm-searchMatch {
+  background: var(--mdpad-fg);
+  color: var(--mdpad-bg);
+  border-radius: 2px;
+}
+.cm-editor .cm-searchMatch-selected {
+  background: var(
+    --vscode-editor-findMatchHighlightBackground,
+    rgba(255, 150, 0, 0.5)
+  );
+}
+
 /* ---------------------------------------------------------------------------
    Markdown decoration styles
    --------------------------------------------------------------------------- */

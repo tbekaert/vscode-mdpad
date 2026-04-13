@@ -1,4 +1,5 @@
 import './styles.css'
+import { openSearchPanel } from '@codemirror/search'
 import { createEditor, type EditorHandle, wrapSelection } from './editor'
 import type { ExtensionMessage } from './types'
 
@@ -62,6 +63,9 @@ const init = (): void => {
               break
             case 'toggleStrikethrough':
               wrapSelection(editor.view, '~~')
+              break
+            case 'openSearch':
+              openSearchPanel(editor.view)
               break
           }
           break

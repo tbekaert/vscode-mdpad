@@ -51,6 +51,7 @@ Fenced code blocks get syntax highlighting for 19 languages including JavaScript
 | Strikethrough | `Ctrl+Shift+X` | `Ctrl+Shift+X` |
 | Inline code   | `` Ctrl+Shift+` `` | `` Ctrl+Shift+` `` |
 | Heading cycle | `Ctrl+Shift+H` | `Ctrl+Shift+H` |
+| Find          | `Cmd+F`        | `Ctrl+F`       |
 | Indent list   | `Tab`          | `Tab`          |
 | Outdent list  | `Shift+Tab`    | `Shift+Tab`    |
 

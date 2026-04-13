@@ -282,6 +282,12 @@ export const activate = (context: vscode.ExtensionContext): void => {
   )
 
   context.subscriptions.push(
+    vscode.commands.registerCommand('mdpad.find', () =>
+      postCommandToActive('openSearch'),
+    ),
+  )
+
+  context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration(e => {
       if (e.affectsConfiguration('mdpad')) {
         sendSettingsToActive()
