@@ -9,7 +9,7 @@ import {
   syntaxHighlighting,
   toggleFold,
 } from '@codemirror/language'
-import { Compartment, EditorState } from '@codemirror/state'
+import { Compartment, EditorState, Prec } from '@codemirror/state'
 import {
   Decoration,
   type DecorationSet,
@@ -204,6 +204,31 @@ export const indentList = (view: EditorView): boolean =>
 export const outdentList = (view: EditorView): boolean =>
   shiftListItem(view, 'out')
 
+export const continueOrderedList = (view: EditorView): boolean => {
+  const { head, anchor } = view.state.selection.main
+  if (head !== anchor) return false
+  const line = view.state.doc.lineAt(head)
+  if (head !== line.to) return false
+  const match = line.text.match(/^(\s*)(\d+)([.)])\s(.*)$/)
+  if (!match) return false
+  const [, indent, numStr, suffix, content] = match
+  // If the content is empty, clear the marker and insert blank line (exit list)
+  if (content.length === 0) {
+    view.dispatch({
+      changes: { from: line.from, to: line.to, insert: '' },
+      selection: { anchor: line.from },
+    })
+    return true
+  }
+  const nextNum = Number.parseInt(numStr, 10) + 1
+  const insert = `\n${indent}${nextNum}${suffix} `
+  view.dispatch({
+    changes: { from: head, to: head, insert },
+    selection: { anchor: head + insert.length },
+  })
+  return true
+}
+
 export const toggleHeading = (view: EditorView): boolean => {
   const line = view.state.doc.lineAt(view.state.selection.main.head)
   const match = line.text.match(/^(#{1,3})\s/)
@@ -228,6 +253,10 @@ const mdKeymap: KeyBinding[] = [
   { key: 'Ctrl-Shift-h', run: toggleHeading },
   { key: 'Tab', run: indentList },
   { key: 'Shift-Tab', run: outdentList },
+]
+
+const mdHighPrecedenceKeymap: KeyBinding[] = [
+  { key: 'Enter', run: continueOrderedList },
 ]
 
 export const isLinkable = (text: string): boolean =>
@@ -442,8 +471,10 @@ const inlineFoldWidgets = ViewPlugin.fromClass(
       this.attachClickHandler(view)
     }
 
-    update(): void {
-      this.decorations = this.build(this.editorView)
+    update(update: { docChanged: boolean }): void {
+      if (update.docChanged) {
+        this.decorations = this.build(this.editorView)
+      }
     }
 
     attachClickHandler(view: EditorView): void {
@@ -452,13 +483,16 @@ const inlineFoldWidgets = ViewPlugin.fromClass(
         const lineEl = target.closest('.mdpad-foldable')
         if (!lineEl) return
         const rect = lineEl.getBoundingClientRect()
-        // Only trigger on clicks in the chevron area (right side of line)
         if (e.clientX < rect.right - 40) return
         e.preventDefault()
-        const pos = view.posAtDOM(lineEl)
-        const line = view.state.doc.lineAt(pos)
-        view.dispatch({ selection: { anchor: line.from } })
-        toggleFold(view)
+        e.stopPropagation()
+        setTimeout(() => {
+          const pos = view.posAtDOM(lineEl)
+          const line = view.state.doc.lineAt(pos)
+          view.dispatch({ selection: { anchor: line.from } })
+          toggleFold(view)
+          this.decorations = this.build(view)
+        }, 0)
       })
     }
 
@@ -526,7 +560,6 @@ const vsCodeTheme = EditorView.theme({
   '.cm-content': {
     caretColor: 'var(--mdpad-fg)',
     fontSize: 'var(--vscode-font-size, 13px)',
-    padding: '12px 0',
   },
   '.cm-cursor': {
     borderLeftColor: 'var(--mdpad-fg)',
@@ -547,26 +580,12 @@ const buildSettingsExtensions = (settings: MdpadSettings) => {
       ? 'var(--vscode-font-family, sans-serif)'
       : settings.fontFamily
 
-  const r = settings.headingScale
-  const h1 = `${(r * r * r).toFixed(3)}em`
-  const h2 = `${(r * r).toFixed(3)}em`
-  const h3 = `${r.toFixed(3)}em`
-  const h4 = '1em'
-  const h5 = `${(1 / r).toFixed(3)}em`
-  const h6 = `${(1 / (r * r)).toFixed(3)}em`
-
   const extensions = [
     EditorView.theme({
       '.cm-content': {
         fontFamily,
         lineHeight: String(settings.lineHeight),
       },
-      '.mdpad-heading-1': { fontSize: h1 },
-      '.mdpad-heading-2': { fontSize: h2 },
-      '.mdpad-heading-3': { fontSize: h3 },
-      '.mdpad-heading-4': { fontSize: h4 },
-      '.mdpad-heading-5': { fontSize: h5 },
-      '.mdpad-heading-6': { fontSize: h6 },
     }),
   ]
 
@@ -612,7 +631,6 @@ export const createEditor = (
           buildSettingsExtensions({
             fontFamily: 'inherit',
             lineHeight: 1.6,
-            headingScale: 1.25,
             listIndentSize: 2,
             lineNumbers: false,
             lineWrapping: true,
@@ -631,6 +649,7 @@ export const createEditor = (
             return span
           },
         }),
+        Prec.highest(keymap.of(mdHighPrecedenceKeymap)),
         keymap.of([...mdKeymap, ...defaultKeymap, ...historyKeymap]),
         updateListener,
         markdownDecorations,
