@@ -130,4 +130,54 @@ test.describe('decorations', () => {
     const mutedCount = await page.locator('.mdpad-muted').count()
     expect(mutedCount).toBeGreaterThan(0)
   })
+
+  test.describe('frontmatter — edge cases', () => {
+    // These guard the shared findFrontmatterEndLine helper used by both
+    // the decoration pass and the fold service.
+
+    test('both fence lines and every key are muted', async ({ page }) => {
+      await initEditor(
+        page,
+        '---\ntitle: My Title\ntags: a, b\n---\n\n# heading',
+      )
+      // Both `---` fence lines should be fully muted
+      const firstFence = page.locator('.cm-line').nth(0)
+      const closingFence = page.locator('.cm-line').nth(3)
+      await expect(firstFence.locator('.mdpad-muted')).not.toHaveCount(0)
+      await expect(closingFence.locator('.mdpad-muted')).not.toHaveCount(0)
+
+      // key prefixes (up to and including `:`) are muted on the key lines
+      const titleLine = page.locator('.cm-line').nth(1)
+      const tagsLine = page.locator('.cm-line').nth(2)
+      await expect(titleLine.locator('.mdpad-muted').first()).toHaveText(
+        'title:',
+      )
+      await expect(tagsLine.locator('.mdpad-muted').first()).toHaveText('tags:')
+    })
+
+    test('unterminated frontmatter does not mute key prefixes as frontmatter', async ({
+      page,
+    }) => {
+      // Without a closing `---`, nothing below should be decorated as
+      // frontmatter. The key line must not have its `key:` prefix muted —
+      // that's the fingerprint of the frontmatter pass (tolerated only when
+      // inside a real fenced block).
+      await initEditor(page, '---\nkey: value\nstill body')
+      const keyLine = page.locator('.cm-line').nth(1)
+      const mutedSpans = await keyLine.locator('.mdpad-muted').allTextContents()
+      for (const t of mutedSpans) {
+        expect(t).not.toMatch(/^key:\s*$/)
+      }
+    })
+
+    test('headings inside frontmatter are NOT decorated as headings', async ({
+      page,
+    }) => {
+      await initEditor(page, '---\n# not a heading\n---\n\n# real heading')
+      const headingCount = await page.locator('.mdpad-heading-1').count()
+      // Only the real heading on line 5 should get the heading decoration
+      expect(headingCount).toBe(1)
+      await expect(page.locator('.mdpad-heading-1')).toHaveText('real heading')
+    })
+  })
 })

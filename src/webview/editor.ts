@@ -25,7 +25,15 @@ import { tags } from '@lezer/highlight'
 import { GFM } from '@lezer/markdown'
 import { codeLanguages } from './codeLanguages'
 import { attachClickHandlers, markdownDecorations } from './decorations'
-import { setListIndent } from './listPatterns'
+import { findFrontmatterEndLine } from './frontmatter'
+import {
+  LIST_INDENT,
+  LIST_INDENT_SIZE,
+  listPattern,
+  olPattern,
+  setListIndent,
+  ulMarkers,
+} from './listPatterns'
 import { tableAutoFormat } from './tableFormatter'
 import type { MdpadSettings } from './types'
 
@@ -88,14 +96,6 @@ export const wrapSelection = (view: EditorView, marker: string): boolean => {
   })
   return true
 }
-
-import {
-  LIST_INDENT,
-  LIST_INDENT_SIZE,
-  listPattern,
-  olPattern,
-  ulMarkers,
-} from './listPatterns'
 
 const renumberOlSiblings = (
   doc: import('@codemirror/state').Text,
@@ -412,26 +412,14 @@ const mdFoldService = foldService.of((state, lineStart, lineEnd) => {
   const doc = state.doc
   const line = doc.lineAt(lineStart)
 
+  const frontmatterEndLine = findFrontmatterEndLine(doc)
+
   // Frontmatter: fold from first --- to closing ---
-  if (line.number === 1 && line.text.trim() === '---') {
-    for (let i = 2; i <= doc.lines; i++) {
-      if (doc.line(i).text.trim() === '---') {
-        return { from: line.to, to: doc.line(i).to }
-      }
-    }
-    return null
+  if (line.number === 1 && frontmatterEndLine > 0) {
+    return { from: line.to, to: doc.line(frontmatterEndLine).to }
   }
 
-  // Determine frontmatter boundary to exclude headings inside it
-  let frontmatterEndLine = 0
-  if (doc.lines >= 3 && doc.line(1).text.trim() === '---') {
-    for (let i = 2; i <= doc.lines; i++) {
-      if (doc.line(i).text.trim() === '---') {
-        frontmatterEndLine = i
-        break
-      }
-    }
-  }
+  // Exclude headings inside the frontmatter block
   if (frontmatterEndLine > 0 && line.number <= frontmatterEndLine) return null
 
   // H2/H3 headings: fold to next heading of same or higher level
@@ -473,11 +461,13 @@ const inlineFoldWidgets = ViewPlugin.fromClass(
   class {
     decorations: DecorationSet
     private editorView: EditorView
+    private clickHandler: (e: MouseEvent) => void
 
     constructor(view: EditorView) {
       this.editorView = view
       this.decorations = this.build(view)
-      this.attachClickHandler(view)
+      this.clickHandler = e => this.handleClick(view, e)
+      view.dom.addEventListener('click', this.clickHandler)
     }
 
     update(update: { docChanged: boolean }): void {
@@ -486,23 +476,25 @@ const inlineFoldWidgets = ViewPlugin.fromClass(
       }
     }
 
-    attachClickHandler(view: EditorView): void {
-      view.dom.addEventListener('click', e => {
-        const target = e.target as HTMLElement
-        const lineEl = target.closest('.mdpad-foldable')
-        if (!lineEl) return
-        const rect = lineEl.getBoundingClientRect()
-        if (e.clientX < rect.right - 40) return
-        e.preventDefault()
-        e.stopPropagation()
-        setTimeout(() => {
-          const pos = view.posAtDOM(lineEl)
-          const line = view.state.doc.lineAt(pos)
-          view.dispatch({ selection: { anchor: line.from } })
-          toggleFold(view)
-          this.decorations = this.build(view)
-        }, 0)
-      })
+    destroy(): void {
+      this.editorView.dom.removeEventListener('click', this.clickHandler)
+    }
+
+    handleClick(view: EditorView, e: MouseEvent): void {
+      const target = e.target as HTMLElement
+      const lineEl = target.closest('.mdpad-foldable')
+      if (!lineEl) return
+      const rect = lineEl.getBoundingClientRect()
+      if (e.clientX < rect.right - 40) return
+      e.preventDefault()
+      e.stopPropagation()
+      setTimeout(() => {
+        const pos = view.posAtDOM(lineEl)
+        const line = view.state.doc.lineAt(pos)
+        view.dispatch({ selection: { anchor: line.from } })
+        toggleFold(view)
+        this.decorations = this.build(view)
+      }, 0)
     }
 
     build(view: EditorView): DecorationSet {
@@ -518,15 +510,7 @@ const inlineFoldWidgets = ViewPlugin.fromClass(
         return found
       }
 
-      let frontmatterEndLine = 0
-      if (doc.lines >= 3 && doc.line(1).text.trim() === '---') {
-        for (let i = 2; i <= doc.lines; i++) {
-          if (doc.line(i).text.trim() === '---') {
-            frontmatterEndLine = i
-            break
-          }
-        }
-      }
+      const frontmatterEndLine = findFrontmatterEndLine(doc)
 
       for (let i = 1; i <= doc.lines; i++) {
         const line = doc.line(i)
