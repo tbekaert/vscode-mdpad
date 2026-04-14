@@ -105,23 +105,14 @@ describe('deriveTitle', () => {
   })
 
   it('does not match title: outside frontmatter', () => {
-    assert.strictEqual(
-      deriveTitle('title: Not a title\n# Heading'),
-      'Heading',
-    )
+    assert.strictEqual(deriveTitle('title: Not a title\n# Heading'), 'Heading')
   })
 
   it('handles unclosed frontmatter gracefully', () => {
-    assert.strictEqual(
-      deriveTitle('---\ntitle: Orphan\nno closing'),
-      'Orphan',
-    )
+    assert.strictEqual(deriveTitle('---\ntitle: Orphan\nno closing'), 'Orphan')
   })
 
   it('handles frontmatter with only delimiters', () => {
-    assert.strictEqual(
-      deriveTitle('---\n---\n# After'),
-      'After',
-    )
+    assert.strictEqual(deriveTitle('---\n---\n# After'), 'After')
   })
 })
