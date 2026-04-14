@@ -52,6 +52,7 @@ Fenced code blocks get syntax highlighting for 19 languages including JavaScript
 | Inline code   | `` Ctrl+Shift+` `` | `` Ctrl+Shift+` `` |
 | Heading cycle | `Ctrl+Shift+H` | `Ctrl+Shift+H` |
 | Find          | `Cmd+F`        | `Ctrl+F`       |
+| Search pages  | `Cmd+Shift+F`  | `Ctrl+Shift+F` |
 | Indent list   | `Tab`          | `Tab`          |
 | Outdent list  | `Shift+Tab`    | `Shift+Tab`    |
 
@@ -76,6 +77,11 @@ Run **mdpad: Export Current Page** to save the active note as a `.md` file.
 - **Links** — `Cmd+click` (Mac) or `Ctrl+click` (Windows/Linux) to open URLs or file paths in the editor
 - **Paste-as-link** — select text and paste a URL or file path to auto-wrap as `[text](url)`
 - **Tables** — columns align automatically as you type
+
+### Search
+
+- **Find in note** (`Cmd/Ctrl+F`) — search within the current page
+- **Search across pages** (`Cmd/Ctrl+Shift+F`) — search content across all pages in both scopes
 
 ### Floating panel
 

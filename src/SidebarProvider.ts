@@ -3,6 +3,7 @@ import { getWebviewHtml } from './getWebviewHtml'
 import { handleWebviewMessage } from './handleWebviewMessage'
 import type { NotesStorage } from './NotesStorage'
 import type {
+  ExtensionMessage,
   MdpadCommand,
   MdpadSettings,
   WebviewMessage,
@@ -72,6 +73,12 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   sendSettings(settings: MdpadSettings): void {
     if (this.view) {
       this.view.webview.postMessage({ type: 'settings', ...settings })
+    }
+  }
+
+  postMessage(message: ExtensionMessage): void {
+    if (this.view) {
+      this.view.webview.postMessage(message)
     }
   }
 

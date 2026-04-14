@@ -2,4 +2,4 @@
 "mdpad": minor
 ---
 
-Add find in notes (Cmd/Ctrl+F) with minimal VS Code-themed search panel
+Add find in note (Cmd/Ctrl+F) and search across all pages (Cmd/Ctrl+Shift+F) via QuickPick with cursor navigation
