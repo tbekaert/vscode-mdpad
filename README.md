@@ -25,7 +25,7 @@ Notes default to workspace scope — tied to the current project. Click the scop
 
 ### Muted-syntax editing
 
-Markdown characters (`#`, `**`, `*`, `` ` ``, `~~`) stay visible but dimmed. Content is styled live — headings are large, bold is bold, code is monospace.
+Markdown characters (`#`, `**`, `*`, `` ` ``, `~~`, `==`) stay visible but dimmed. Content is styled live — headings are large, bold is bold, code is monospace, highlights are highlighted.
 
 ### Multiple pages
 
@@ -50,6 +50,7 @@ Fenced code blocks get syntax highlighting for 19 languages including JavaScript
 | Italic        | `Ctrl+I`       | `Ctrl+I`       |
 | Strikethrough | `Ctrl+Shift+X` | `Ctrl+Shift+X` |
 | Inline code   | `` Ctrl+Shift+` `` | `` Ctrl+Shift+` `` |
+| Highlight     | `Ctrl+Shift+E` | `Ctrl+Shift+E` |
 | Heading cycle | `Ctrl+Shift+H` | `Ctrl+Shift+H` |
 | Find          | `Cmd+F`        | `Ctrl+F`       |
 | Search pages  | `Cmd+Shift+F`  | `Ctrl+Shift+F` |

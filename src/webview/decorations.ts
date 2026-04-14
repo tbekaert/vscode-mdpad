@@ -18,6 +18,7 @@ const muted = Decoration.mark({ class: 'mdpad-muted' })
 const boldMark = Decoration.mark({ class: 'mdpad-bold' })
 const italicMark = Decoration.mark({ class: 'mdpad-italic' })
 const strikeMark = Decoration.mark({ class: 'mdpad-strike' })
+const highlightMark = Decoration.mark({ class: 'mdpad-highlight' })
 const inlineCodeMark = Decoration.mark({ class: 'mdpad-inline-code' })
 const linkTextMark = Decoration.mark({ class: 'mdpad-link-text' })
 const headingMarks: Record<number, Decoration> = {
@@ -351,6 +352,24 @@ const buildDecorations = (view: EditorView): DecorationSet => {
       }
     },
   })
+
+  // Highlight ==text== (not a GFM node, requires regex pass)
+  const highlightPattern = /==(.*?)==/g
+  for (let i = 1; i <= doc.lines; i++) {
+    const line = doc.line(i)
+    highlightPattern.lastIndex = 0
+    for (
+      let match = highlightPattern.exec(line.text);
+      match !== null;
+      match = highlightPattern.exec(line.text)
+    ) {
+      const start = line.from + match.index
+      const end = start + match[0].length
+      decorations.push(muted.range(start, start + 2))
+      decorations.push(highlightMark.range(start + 2, end - 2))
+      decorations.push(muted.range(end - 2, end))
+    }
+  }
 
   decorations.sort((a, b) => a.from - b.from)
   return Decoration.set(decorations, true)
