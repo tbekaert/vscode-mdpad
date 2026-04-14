@@ -43,7 +43,7 @@ Two webpack bundles from one config file:
 
 **Webview** (`dist/webview.js`, target: web):
 - `src/webview/index.ts` — Entry point. Mounts editor, wires toolbar, handles postMessage.
-- `src/webview/editor.ts` — CodeMirror 6 with GFM, VS Code theme, keyboard shortcuts, list indent/outdent, paste-as-link, auto-close fences. Uses a `codeMirrorSettings` Compartment for live setting reconfiguration.
+- `src/webview/editor.ts` — CodeMirror 6 with GFM, VS Code theme, keyboard shortcuts, list indent/outdent, paste-as-link, auto-close fences. Uses a `codeMirrorSettings` Compartment for live setting reconfiguration (font, line height, heading scale, line numbers, line wrapping, folding).
 - `src/webview/decorations.ts` — Muted-syntax ViewPlugin. Mark/line decorations only (no Decoration.replace). Click handlers for checkboxes and links. Regex-based passes for `==highlight==` and frontmatter.
 - `src/webview/editor.ts` contains section folding: `foldService` for H2/H3/frontmatter fold ranges, `foldGutter` (with line numbers), inline `FoldWidget` (without line numbers).
 - `src/webview/codeLanguages.ts` — Eagerly loaded language grammars for syntax highlighting in fenced code blocks.

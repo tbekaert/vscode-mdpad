@@ -43,11 +43,19 @@ export const activate = (context: vscode.ExtensionContext): void => {
   const scopeLabel = (): string =>
     currentScope === 'workspace' ? 'Workspace' : 'Global'
 
+  const parseHeadingScale = (label: string): number => {
+    const match = label.match(/\(([0-9.]+)\)/)
+    return match ? Number.parseFloat(match[1]) : 1.25
+  }
+
   const getSettings = (): MdpadSettings => {
     const config = vscode.workspace.getConfiguration('mdpad')
     return {
       fontFamily: config.get<string>('fontFamily', 'inherit'),
       lineHeight: config.get<number>('lineHeight', 1.6),
+      headingScale: parseHeadingScale(
+        config.get<string>('headingScale', 'Major Third (1.250)'),
+      ),
       listIndentSize: config.get<number>('listIndentSize', 2),
       lineNumbers: config.get<boolean>('lineNumbers', false),
       lineWrapping: config.get<boolean>('lineWrapping', true),

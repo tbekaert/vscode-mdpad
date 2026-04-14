@@ -79,6 +79,7 @@ Collapse H2 and H3 sections and frontmatter blocks (enable via `mdpad.folding` s
 | ------- | ------- | ----------- |
 | `mdpad.fontFamily` | `"inherit"` | Font family. `"inherit"` uses the VS Code theme font. |
 | `mdpad.lineHeight` | `1.6` | Line height in the editor. |
+| `mdpad.headingScale` | `"Major Third (1.250)"` | Typographic scale ratio for heading sizes. |
 | `mdpad.lineWrapping` | `true` | Wrap long lines. |
 | `mdpad.folding` | `false` | Enable section folding for H2, H3, and frontmatter. |
 | `mdpad.listIndentSize` | `2` | Spaces per list indent level. |

@@ -547,12 +547,26 @@ const buildSettingsExtensions = (settings: MdpadSettings) => {
       ? 'var(--vscode-font-family, sans-serif)'
       : settings.fontFamily
 
+  const r = settings.headingScale
+  const h1 = `${(r * r * r).toFixed(3)}em`
+  const h2 = `${(r * r).toFixed(3)}em`
+  const h3 = `${r.toFixed(3)}em`
+  const h4 = '1em'
+  const h5 = `${(1 / r).toFixed(3)}em`
+  const h6 = `${(1 / (r * r)).toFixed(3)}em`
+
   const extensions = [
     EditorView.theme({
       '.cm-content': {
         fontFamily,
         lineHeight: String(settings.lineHeight),
       },
+      '.mdpad-heading-1': { fontSize: h1 },
+      '.mdpad-heading-2': { fontSize: h2 },
+      '.mdpad-heading-3': { fontSize: h3 },
+      '.mdpad-heading-4': { fontSize: h4 },
+      '.mdpad-heading-5': { fontSize: h5 },
+      '.mdpad-heading-6': { fontSize: h6 },
     }),
   ]
 
@@ -594,7 +608,17 @@ export const createEditor = (
       doc: initialContent,
       extensions: [
         vsCodeTheme,
-        codeMirrorSettings.of([EditorView.lineWrapping]),
+        codeMirrorSettings.of(
+          buildSettingsExtensions({
+            fontFamily: 'inherit',
+            lineHeight: 1.6,
+            headingScale: 1.25,
+            listIndentSize: 2,
+            lineNumbers: false,
+            lineWrapping: true,
+            folding: false,
+          }),
+        ),
         markdown({ extensions: GFM, codeLanguages }),
         syntaxHighlighting(codeHighlight),
         history(),
