@@ -227,21 +227,6 @@
           "default": 1.6,
           "description": "Line height in the editor."
         },
-        "mdpad.headingScale": {
-          "type": "string",
-          "default": "Major Third (1.250)",
-          "enum": [
-            "Minor Second (1.067)",
-            "Major Second (1.125)",
-            "Minor Third (1.200)",
-            "Major Third (1.250)",
-            "Perfect Fourth (1.333)",
-            "Augmented Fourth (1.414)",
-            "Perfect Fifth (1.500)",
-            "Golden Ratio (1.618)"
-          ],
-          "description": "Typographic scale ratio for heading sizes."
-        },
         "mdpad.lineWrapping": {
           "type": "boolean",
           "default": true,
