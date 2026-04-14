@@ -72,7 +72,8 @@ Global notes can optionally be synced across devices via VS Code's Settings Sync
 
 ## Manual QA
 
-`.github/test-content.md` contains a markdown document that exercises every mdpad feature. Copy-paste it into mdpad to manually verify formatting, shortcuts, lists, code blocks, links, search, folding, and frontmatter. **Keep this file updated** when adding new user-facing features.
+- `.github/test-content.md` — exercises every mdpad feature. Copy-paste into mdpad for manual QA. **Keep updated** when adding features.
+- `.github/welcome-content.md` — the default welcome note shown to new users. **Keep in sync** with `WELCOME_CONTENT` in `src/NotesStorage.ts` when updating either.
 
 ## Conventions
 

@@ -5,18 +5,52 @@ const STORAGE_KEY = 'mdpad.notes'
 
 const WELCOME_CONTENT = `# Welcome to mdpad
 
-A lightweight markdown notepad inside VS Code. Just type — markdown syntax is styled as you write.
+Your markdown notepad inside VS Code.
 
-## Try it out
+## Formatting
 
-- **Bold**, *italic*, and ~~strikethrough~~ are styled inline
-- Syntax characters like **\`**\` stay visible but dimmed
-- [x] Click the brackets to toggle checkboxes
-- [ ] Like this one
-- Create multiple pages with the toolbar above
-- \`Cmd/Ctrl+click\` on [links](https://github.com) to open them
+**Bold**, *italic*, ~~strikethrough~~, \`inline code\`, and ==highlighted==.
 
-> Tip: Run the command **mdpad: Open as Panel** to use mdpad as a floating editor panel.
+## Lists
+
+- Unordered list item
+  * Nested with different marker
+    + Deeply nested
+
+1. Ordered list
+2. With automatic
+  1. Renumbering
+  2. On indent
+
+## Tasks
+
+- [x] Completed task
+- [ ] Uncompleted task
+  - [ ] Nested task
+
+## Blockquote
+
+> Markdown syntax stays visible but dimmed.
+> Content is styled live as you type.
+
+## Tips
+
+| Shortcut | Action |
+| -------- | ------ |
+| \`Ctrl+B\` | Bold |
+| \`Ctrl+I\` | Italic |
+| \`Ctrl+Shift+X\` | Strikethrough |
+| \`Ctrl+Shift+\`\` | Inline code |
+| \`Ctrl+Shift+E\` | Highlight |
+| \`Ctrl+Shift+H\` | Cycle heading |
+| \`Cmd/Ctrl+F\` | Find in note |
+| \`Cmd/Ctrl+Shift+F\` | Search all pages |
+| \`Tab\` / \`Shift+Tab\` | Indent / outdent list |
+
+- Globe icon: switch to Global notes
+- Overflow menu: Export, Settings
+
+> Delete this page whenever you're ready to start fresh.
 `
 
 const createPage = (content = ''): Page => ({
