@@ -51,6 +51,7 @@ export const activate = (context: vscode.ExtensionContext): void => {
       listIndentSize: config.get<number>('listIndentSize', 2),
       lineNumbers: config.get<boolean>('lineNumbers', false),
       lineWrapping: config.get<boolean>('lineWrapping', true),
+      folding: config.get<boolean>('folding', false),
     }
   }
 

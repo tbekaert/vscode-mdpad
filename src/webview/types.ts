@@ -22,6 +22,7 @@ export interface MdpadSettings {
   listIndentSize: number
   lineNumbers: boolean
   lineWrapping: boolean
+  folding: boolean
 }
 
 // Extension -> Webview messages

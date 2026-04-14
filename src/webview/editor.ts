@@ -1,14 +1,25 @@
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { markdown } from '@codemirror/lang-markdown'
-import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
+import {
+  codeFolding,
+  foldable,
+  foldedRanges,
+  foldService,
+  HighlightStyle,
+  syntaxHighlighting,
+  toggleFold,
+} from '@codemirror/language'
 import { Compartment, EditorState } from '@codemirror/state'
 import {
+  Decoration,
+  type DecorationSet,
   drawSelection,
   EditorView,
   type KeyBinding,
   keymap,
   lineNumbers,
   placeholder,
+  ViewPlugin,
 } from '@codemirror/view'
 import { tags } from '@lezer/highlight'
 import { GFM } from '@lezer/markdown'
@@ -350,6 +361,163 @@ const codeHighlight = HighlightStyle.define([
   { tag: tags.punctuation, color: 'var(--vscode-editor-foreground, #d4d4d4)' },
 ])
 
+// ---------------------------------------------------------------------------
+// Section folding
+// ---------------------------------------------------------------------------
+
+const headingLevel = (lineText: string): number => {
+  const match = lineText.match(/^(#{1,6})\s/)
+  return match ? match[1].length : 0
+}
+
+const mdFoldService = foldService.of((state, lineStart, lineEnd) => {
+  const doc = state.doc
+  const line = doc.lineAt(lineStart)
+
+  // Frontmatter: fold from first --- to closing ---
+  if (line.number === 1 && line.text.trim() === '---') {
+    for (let i = 2; i <= doc.lines; i++) {
+      if (doc.line(i).text.trim() === '---') {
+        return { from: line.to, to: doc.line(i).to }
+      }
+    }
+    return null
+  }
+
+  // Determine frontmatter boundary to exclude headings inside it
+  let frontmatterEndLine = 0
+  if (doc.lines >= 3 && doc.line(1).text.trim() === '---') {
+    for (let i = 2; i <= doc.lines; i++) {
+      if (doc.line(i).text.trim() === '---') {
+        frontmatterEndLine = i
+        break
+      }
+    }
+  }
+  if (frontmatterEndLine > 0 && line.number <= frontmatterEndLine) return null
+
+  // H2/H3 headings: fold to next heading of same or higher level
+  const level = headingLevel(line.text)
+  if (level < 2 || level > 3) return null
+
+  for (let i = line.number + 1; i <= doc.lines; i++) {
+    const nextLevel = headingLevel(doc.line(i).text)
+    if (nextLevel > 0 && nextLevel <= level) {
+      const endLine = doc.line(i - 1)
+      if (endLine.number <= line.number) return null
+      let hasContent = false
+      for (let j = line.number + 1; j <= endLine.number; j++) {
+        if (doc.line(j).text.trim().length > 0) {
+          hasContent = true
+          break
+        }
+      }
+      if (!hasContent) return null
+      return { from: line.to, to: endLine.to }
+    }
+  }
+
+  // Fold to end of document — only if there's non-empty content after the heading
+  const lastLine = doc.line(doc.lines)
+  if (lastLine.number <= line.number) return null
+  let hasContent = false
+  for (let i = line.number + 1; i <= doc.lines; i++) {
+    if (doc.line(i).text.trim().length > 0) {
+      hasContent = true
+      break
+    }
+  }
+  if (!hasContent) return null
+  return { from: line.to, to: lastLine.to }
+})
+
+const inlineFoldWidgets = ViewPlugin.fromClass(
+  class {
+    decorations: DecorationSet
+    private editorView: EditorView
+
+    constructor(view: EditorView) {
+      this.editorView = view
+      this.decorations = this.build(view)
+      this.attachClickHandler(view)
+    }
+
+    update(): void {
+      this.decorations = this.build(this.editorView)
+    }
+
+    attachClickHandler(view: EditorView): void {
+      view.dom.addEventListener('click', e => {
+        const target = e.target as HTMLElement
+        const lineEl = target.closest('.mdpad-foldable')
+        if (!lineEl) return
+        const rect = lineEl.getBoundingClientRect()
+        // Only trigger on clicks in the chevron area (right side of line)
+        if (e.clientX < rect.right - 40) return
+        e.preventDefault()
+        const pos = view.posAtDOM(lineEl)
+        const line = view.state.doc.lineAt(pos)
+        view.dispatch({ selection: { anchor: line.from } })
+        toggleFold(view)
+      })
+    }
+
+    build(view: EditorView): DecorationSet {
+      const decos: { from: number; deco: Decoration }[] = []
+      const doc = view.state.doc
+      const folded = foldedRanges(view.state)
+
+      const isFolded = (lineEnd: number): boolean => {
+        let found = false
+        folded.between(lineEnd, lineEnd, () => {
+          found = true
+        })
+        return found
+      }
+
+      let frontmatterEndLine = 0
+      if (doc.lines >= 3 && doc.line(1).text.trim() === '---') {
+        for (let i = 2; i <= doc.lines; i++) {
+          if (doc.line(i).text.trim() === '---') {
+            frontmatterEndLine = i
+            break
+          }
+        }
+      }
+
+      for (let i = 1; i <= doc.lines; i++) {
+        const line = doc.line(i)
+        let foldLevel = 0
+
+        if (i === 1 && frontmatterEndLine > 0) {
+          foldLevel = -1
+        } else if (frontmatterEndLine > 0 && i <= frontmatterEndLine) {
+          continue
+        } else {
+          const level = headingLevel(line.text)
+          if (level >= 2 && level <= 3) foldLevel = level
+        }
+
+        if (foldLevel === 0) continue
+        if (!isFolded(line.to) && !foldable(view.state, line.from, line.to))
+          continue
+
+        const folding = isFolded(line.to)
+        const cls = folding
+          ? `mdpad-foldable mdpad-foldable-${foldLevel} mdpad-folded`
+          : `mdpad-foldable mdpad-foldable-${foldLevel}`
+        decos.push({
+          from: line.from,
+          deco: Decoration.line({ class: cls }),
+        })
+      }
+
+      return Decoration.set(decos.map(d => d.deco.range(d.from)))
+    }
+  },
+  { decorations: v => v.decorations },
+)
+
 const vsCodeTheme = EditorView.theme({
   '&': {
     backgroundColor: 'var(--mdpad-bg)',
@@ -396,6 +564,10 @@ const buildSettingsExtensions = (settings: MdpadSettings) => {
     extensions.push(lineNumbers())
   }
 
+  if (settings.folding) {
+    extensions.push(inlineFoldWidgets)
+  }
+
   return extensions
 }
 
@@ -428,6 +600,13 @@ export const createEditor = (
         history(),
         drawSelection(),
         placeholder('Start typing your notes...'),
+        mdFoldService,
+        codeFolding({
+          placeholderDOM: () => {
+            const span = document.createElement('span')
+            return span
+          },
+        }),
         keymap.of([...mdKeymap, ...defaultKeymap, ...historyKeymap]),
         updateListener,
         markdownDecorations,

@@ -30,8 +30,10 @@ pnpm test:integration # Run integration tests (launches VS Code)
 2. **Make your changes** — keep PRs focused on one thing
 3. **Add tests** for new functionality
 4. **Run checks** — `pnpm lint && pnpm test:unit && pnpm webpack` should all pass
-5. **Add a changeset** — run `pnpm changeset` for any user-facing change
-6. **Open a PR** against `main`
+5. **Manual QA** — copy-paste `.github/test-content.md` into mdpad to verify features visually
+6. **Add a changeset** — run `pnpm changeset` for any user-facing change
+7. **Update test content** — if your change adds a user-facing feature, add a section to `.github/test-content.md`
+8. **Open a PR** against `main`
 
 ## Commit conventions
 
