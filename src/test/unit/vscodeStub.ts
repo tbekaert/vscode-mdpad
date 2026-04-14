@@ -13,7 +13,12 @@ const record = (method: string, args: unknown[]): void => {
   calls.push({ method, args })
 }
 
-type FakeUri = { scheme: string; fsPath: string; path: string; toString(): string }
+type FakeUri = {
+  scheme: string
+  fsPath: string
+  path: string
+  toString(): string
+}
 
 const makeUri = (raw: string): FakeUri => ({
   scheme: raw.match(/^([a-z]+):/)?.[1] ?? 'file',

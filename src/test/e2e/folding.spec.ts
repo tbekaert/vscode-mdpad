@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { initEditor, sendMessage, DEFAULT_SETTINGS } from './utils'
+import { DEFAULT_SETTINGS, initEditor, sendMessage } from './utils'
 
 test.describe('folding', () => {
   test('fold chevron appears on H2 when folding is enabled', async ({

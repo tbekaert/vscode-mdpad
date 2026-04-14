@@ -82,7 +82,9 @@ describe('handleWebviewMessage', () => {
       )
       // openTextDocument is called synchronously; resolution is async
       await new Promise(r => setTimeout(r, 0))
-      const openCall = calls.find(c => c.method === 'workspace.openTextDocument')
+      const openCall = calls.find(
+        c => c.method === 'workspace.openTextDocument',
+      )
       assert.ok(openCall, 'expected openTextDocument to be called')
       const uri = openCall.args[0] as { path: string }
       assert.match(uri.path, /\/workspace\/notes\/foo\.md$/)

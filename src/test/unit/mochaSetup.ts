@@ -8,7 +8,11 @@ import path from 'node:path'
 const stubPath = path.resolve(__dirname, 'vscodeStub.js')
 
 type ModuleWithInternals = typeof Module & {
-  _resolveFilename: (request: string, parent: unknown, ...rest: unknown[]) => string
+  _resolveFilename: (
+    request: string,
+    parent: unknown,
+    ...rest: unknown[]
+  ) => string
 }
 
 const moduleInternals = Module as ModuleWithInternals

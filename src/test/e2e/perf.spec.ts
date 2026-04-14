@@ -44,7 +44,10 @@ test.describe('perf', () => {
       ).__mdpadView
       if (!view) throw new Error('editor not ready')
       view.dispatch({
-        selection: { anchor: view.state.doc.length, head: view.state.doc.length },
+        selection: {
+          anchor: view.state.doc.length,
+          head: view.state.doc.length,
+        },
       })
     })
 

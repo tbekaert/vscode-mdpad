@@ -152,9 +152,7 @@ test.describe('decorations', () => {
       await expect(titleLine.locator('.mdpad-muted').first()).toHaveText(
         'title:',
       )
-      await expect(tagsLine.locator('.mdpad-muted').first()).toHaveText(
-        'tags:',
-      )
+      await expect(tagsLine.locator('.mdpad-muted').first()).toHaveText('tags:')
     })
 
     test('unterminated frontmatter does not mute key prefixes as frontmatter', async ({

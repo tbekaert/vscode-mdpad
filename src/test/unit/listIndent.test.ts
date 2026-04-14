@@ -212,10 +212,7 @@ describe('listIndent', () => {
       indentList(view)
       // The `3. c` line after plain text is a separate list — it should not
       // be renumbered as a sibling of `1. a`.
-      assert.strictEqual(
-        view.state.doc.toString(),
-        '1. a\n  1. b\ntext\n3. c',
-      )
+      assert.strictEqual(view.state.doc.toString(), '1. a\n  1. b\ntext\n3. c')
     })
 
     it('outdent of a singleton sublist does not corrupt its parent numbering', () => {

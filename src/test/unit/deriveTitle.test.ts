@@ -122,10 +122,7 @@ describe('deriveTitle', () => {
     // the title fallback. Pinning this behaviour so a future refactor can't
     // silently drift.
     it('unterminated frontmatter without title falls back to the --- line', () => {
-      assert.strictEqual(
-        deriveTitle('---\nkey: v\nbody text'),
-        '---',
-      )
+      assert.strictEqual(deriveTitle('---\nkey: v\nbody text'), '---')
     })
 
     it('two-line doc starting with --- is not treated as frontmatter', () => {
@@ -138,10 +135,7 @@ describe('deriveTitle', () => {
     })
 
     it('frontmatter title field with no value after whitespace falls through', () => {
-      assert.strictEqual(
-        deriveTitle('---\ntitle:\n---\nbody'),
-        'body',
-      )
+      assert.strictEqual(deriveTitle('---\ntitle:\n---\nbody'), 'body')
     })
   })
 })
