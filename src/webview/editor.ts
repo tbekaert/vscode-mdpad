@@ -222,6 +222,21 @@ const mdKeymap: KeyBinding[] = [
 export const isLinkable = (text: string): boolean =>
   /^https?:\/\//.test(text) || /\.\w{1,10}$/.test(text.trim())
 
+const autoCloseFrontmatter = EditorView.inputHandler.of(
+  (view, from, to, text) => {
+    if (text !== '-') return false
+    const line = view.state.doc.lineAt(from)
+    if (line.number !== 1) return false
+    const before = line.text.slice(0, from - line.from)
+    if (before !== '--') return false
+    view.dispatch({
+      changes: { from, to, insert: '-\n\n---' },
+      selection: { anchor: from + 2 },
+    })
+    return true
+  },
+)
+
 const autoCloseFence = EditorView.inputHandler.of((view, from, to, text) => {
   if (text !== '`') return false
   const line = view.state.doc.lineAt(from)
@@ -419,6 +434,7 @@ export const createEditor = (
         tableAutoFormat,
         pasteAsLink,
         autoCloseFence,
+        autoCloseFrontmatter,
       ],
     }),
     parent,

@@ -38,4 +38,90 @@ describe('deriveTitle', () => {
   it('returns "Empty note" for whitespace-only', () => {
     assert.strictEqual(deriveTitle('   \n  \n  '), 'Empty note')
   })
+
+  it('uses frontmatter title over heading after it', () => {
+    assert.strictEqual(
+      deriveTitle('---\ntitle: My Note\n---\n# Real Title'),
+      'My Note',
+    )
+  })
+
+  it('skips frontmatter and falls back to first content line', () => {
+    assert.strictEqual(
+      deriveTitle('---\ntags: test\n---\njust text'),
+      'just text',
+    )
+  })
+
+  it('does not treat --- in middle of doc as frontmatter', () => {
+    assert.strictEqual(deriveTitle('some text\n---\nmore text'), 'some text')
+  })
+
+  it('returns "Empty note" for frontmatter-only content without title', () => {
+    assert.strictEqual(deriveTitle('---\ntags: test\n---'), 'Empty note')
+  })
+
+  it('uses frontmatter title when present', () => {
+    assert.strictEqual(
+      deriveTitle('---\ntitle: Custom Title\n---\n# Heading'),
+      'Custom Title',
+    )
+  })
+
+  it('frontmatter title takes priority over heading', () => {
+    assert.strictEqual(
+      deriveTitle('---\ntitle: From Frontmatter\n---\n# From Heading'),
+      'From Frontmatter',
+    )
+  })
+
+  it('trims and truncates frontmatter title', () => {
+    const long = 'a'.repeat(60)
+    assert.strictEqual(
+      deriveTitle(`---\ntitle: ${long}\n---`),
+      long.substring(0, 50),
+    )
+  })
+
+  it('falls back to heading if frontmatter has no title field', () => {
+    assert.strictEqual(
+      deriveTitle('---\ntags: test\n---\n# Actual Title'),
+      'Actual Title',
+    )
+  })
+
+  it('ignores empty frontmatter title value', () => {
+    assert.strictEqual(
+      deriveTitle('---\ntitle:   \n---\n# Fallback'),
+      'Fallback',
+    )
+  })
+
+  it('handles frontmatter title with extra whitespace', () => {
+    assert.strictEqual(
+      deriveTitle('---\ntitle:   Spaced Title  \n---'),
+      'Spaced Title',
+    )
+  })
+
+  it('does not match title: outside frontmatter', () => {
+    assert.strictEqual(
+      deriveTitle('title: Not a title\n# Heading'),
+      'Heading',
+    )
+  })
+
+  it('handles unclosed frontmatter gracefully', () => {
+    assert.strictEqual(
+      deriveTitle('---\ntitle: Orphan\nno closing'),
+      'Orphan',
+    )
+  })
+
+  it('handles frontmatter with only delimiters', () => {
+    assert.strictEqual(
+      deriveTitle('---\n---\n# After'),
+      'After',
+    )
+  })
 })

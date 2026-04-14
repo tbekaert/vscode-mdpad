@@ -302,9 +302,22 @@ const buildDecorations = (view: EditorView): DecorationSet => {
   const decorations: Range<Decoration>[] = []
   const tree = syntaxTree(view.state)
   const doc = view.state.doc
+
+  // Determine frontmatter boundary to skip tree decorations inside it
+  let frontmatterEnd = -1
+  if (doc.lines >= 3 && doc.line(1).text.trim() === '---') {
+    for (let i = 2; i <= doc.lines; i++) {
+      if (doc.line(i).text.trim() === '---') {
+        frontmatterEnd = doc.line(i).to
+        break
+      }
+    }
+  }
+
   tree.iterate({
     enter(node) {
       const { from, to, name } = node
+      if (frontmatterEnd >= 0 && from < frontmatterEnd) return
 
       if (headingConfig[name]) {
         decorateHeading(decorations, doc, from, to, name)
@@ -352,6 +365,25 @@ const buildDecorations = (view: EditorView): DecorationSet => {
       }
     },
   })
+
+  // Frontmatter --- block at top of document
+  if (doc.lines >= 3) {
+    const firstLine = doc.line(1)
+    if (firstLine.text.trim() === '---') {
+      decorations.push(muted.range(firstLine.from, firstLine.to))
+      for (let i = 2; i <= doc.lines; i++) {
+        const line = doc.line(i)
+        if (line.text.trim() === '---') {
+          decorations.push(muted.range(line.from, line.to))
+          break
+        }
+        const colonIdx = line.text.indexOf(':')
+        if (colonIdx !== -1 && line.from < line.to) {
+          decorations.push(muted.range(line.from, line.from + colonIdx + 1))
+        }
+      }
+    }
+  }
 
   // Highlight ==text== (not a GFM node, requires regex pass)
   const highlightPattern = /==(.*?)==/g

@@ -36,13 +36,15 @@ Two webpack bundles from one config file:
 - `src/SidebarProvider.ts` — `WebviewViewProvider` for the Explorer sidebar. Accepts storage getter for scope switching.
 - `src/PanelProvider.ts` — Singleton `WebviewPanel` for floating editor. Exclusive mode: only sidebar or panel active at a time. Accepts storage getter for scope switching.
 - `src/NotesStorage.ts` — CRUD over any `vscode.Memento` (workspaceState or globalState). Cached reads. Stores `{ pages: Page[], activeId }`.
+- `src/deriveTitle.ts` — Page title derivation: frontmatter `title:` field > first heading > first non-empty line. Skips frontmatter block.
+- `src/searchLines.ts` — Shared search helper for find-in-note and search-across-pages.
 - `src/handleWebviewMessage.ts` — Shared message handler used by both providers.
 - `src/getWebviewHtml.ts` — HTML generation with nonce-based CSP.
 
 **Webview** (`dist/webview.js`, target: web):
 - `src/webview/index.ts` — Entry point. Mounts editor, wires toolbar, handles postMessage.
 - `src/webview/editor.ts` — CodeMirror 6 with GFM, VS Code theme, keyboard shortcuts, list indent/outdent, paste-as-link, auto-close fences. Uses a `codeMirrorSettings` Compartment for live setting reconfiguration.
-- `src/webview/decorations.ts` — Muted-syntax ViewPlugin. Mark/line decorations only (no widgets, no Decoration.replace). Click handlers for checkboxes and links.
+- `src/webview/decorations.ts` — Muted-syntax ViewPlugin. Mark/line decorations only (no widgets, no Decoration.replace). Click handlers for checkboxes and links. Regex-based passes for `==highlight==` and frontmatter.
 - `src/webview/codeLanguages.ts` — Eagerly loaded language grammars for syntax highlighting in fenced code blocks.
 - `src/webview/listPatterns.ts` — Shared regex patterns and constants for list handling.
 - `src/webview/tableFormatter.ts` — Auto-aligns table columns on 500ms debounce after edits.
