@@ -44,7 +44,8 @@ Two webpack bundles from one config file:
 **Webview** (`dist/webview.js`, target: web):
 - `src/webview/index.ts` — Entry point. Mounts editor, wires toolbar, handles postMessage.
 - `src/webview/editor.ts` — CodeMirror 6 with GFM, VS Code theme, keyboard shortcuts, list indent/outdent, paste-as-link, auto-close fences. Uses a `codeMirrorSettings` Compartment for live setting reconfiguration.
-- `src/webview/decorations.ts` — Muted-syntax ViewPlugin. Mark/line decorations only (no widgets, no Decoration.replace). Click handlers for checkboxes and links. Regex-based passes for `==highlight==` and frontmatter.
+- `src/webview/decorations.ts` — Muted-syntax ViewPlugin. Mark/line decorations only (no Decoration.replace). Click handlers for checkboxes and links. Regex-based passes for `==highlight==` and frontmatter.
+- `src/webview/editor.ts` contains section folding: `foldService` for H2/H3/frontmatter fold ranges, `foldGutter` (with line numbers), inline `FoldWidget` (without line numbers).
 - `src/webview/codeLanguages.ts` — Eagerly loaded language grammars for syntax highlighting in fenced code blocks.
 - `src/webview/listPatterns.ts` — Shared regex patterns and constants for list handling.
 - `src/webview/tableFormatter.ts` — Auto-aligns table columns on 500ms debounce after edits.
@@ -68,6 +69,10 @@ Global notes can optionally be synced across devices via VS Code's Settings Sync
 - Panel ID: `mdpad.panel`
 - Storage key: `mdpad.notes`
 - Context key: `mdpad.focused`
+
+## Manual QA
+
+`.github/test-content.md` contains a markdown document that exercises every mdpad feature. Copy-paste it into mdpad to manually verify formatting, shortcuts, lists, code blocks, links, search, folding, and frontmatter. **Keep this file updated** when adding new user-facing features.
 
 ## Conventions
 

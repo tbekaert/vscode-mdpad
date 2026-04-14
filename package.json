@@ -227,6 +227,16 @@
           "default": 1.6,
           "description": "Line height in the editor."
         },
+        "mdpad.lineWrapping": {
+          "type": "boolean",
+          "default": true,
+          "description": "Wrap long lines."
+        },
+        "mdpad.folding": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable section folding for H2, H3 headings and frontmatter."
+        },
         "mdpad.listIndentSize": {
           "type": "number",
           "default": 2,
@@ -236,11 +246,6 @@
           "type": "boolean",
           "default": false,
           "description": "Show line numbers in the gutter."
-        },
-        "mdpad.lineWrapping": {
-          "type": "boolean",
-          "default": true,
-          "description": "Wrap long lines."
         },
         "mdpad.syncGlobalNotes": {
           "type": "boolean",

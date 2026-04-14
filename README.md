@@ -54,11 +54,15 @@ Create, switch, and delete note pages from the toolbar dropdown. Page titles are
 
 Fenced code blocks get syntax highlighting for 19 languages including JavaScript, TypeScript, Python, JSON, HTML, CSS, SQL, Rust, Go, Java, C/C++, and more. Typing ` ``` ` auto-inserts the closing fence.
 
+### Section folding
+
+Collapse H2 and H3 sections and frontmatter blocks (enable via `mdpad.folding` setting). Click the chevron at the right end of a foldable line to fold/unfold. Only sections with content can be folded.
+
 ### Keyboard shortcuts
 
-| Action        | Mac            | Windows/Linux  |
-| ------------- | -------------- | -------------- |
-| Bold          | `Ctrl+B`       | `Ctrl+B`       |
+| Action        | Mac              | Windows/Linux    |
+| ------------- | ---------------- | ---------------- |
+| Bold          | `Ctrl+B`         | `Ctrl+B`         |
 | Italic        | `Ctrl+I`       | `Ctrl+I`       |
 | Strikethrough | `Ctrl+Shift+X` | `Ctrl+Shift+X` |
 | Inline code   | `` Ctrl+Shift+` `` | `` Ctrl+Shift+` `` |
@@ -75,9 +79,10 @@ Fenced code blocks get syntax highlighting for 19 languages including JavaScript
 | ------- | ------- | ----------- |
 | `mdpad.fontFamily` | `"inherit"` | Font family. `"inherit"` uses the VS Code theme font. |
 | `mdpad.lineHeight` | `1.6` | Line height in the editor. |
+| `mdpad.lineWrapping` | `true` | Wrap long lines. |
+| `mdpad.folding` | `false` | Enable section folding for H2, H3, and frontmatter. |
 | `mdpad.listIndentSize` | `2` | Spaces per list indent level. |
 | `mdpad.lineNumbers` | `false` | Show line numbers in the gutter. |
-| `mdpad.lineWrapping` | `true` | Wrap long lines. |
 | `mdpad.syncGlobalNotes` | `false` | Sync global notes across devices via Settings Sync. Opt-in — once synced, data cannot be removed from the remote. |
 
 ### Export
@@ -110,7 +115,7 @@ Adapts to any VS Code color theme — dark, light, or high contrast.
 
 ## Contributing
 
-Contributions welcome! Clone the repo and press `F5` to launch the extension in a development host.
+Contributions welcome! Clone the repo and press `F5` to launch the extension in a development host. Use `.github/test-content.md` for manual QA — paste it into mdpad to verify all features. See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ```bash
 git clone https://github.com/tbekaert/vscode-mdpad.git

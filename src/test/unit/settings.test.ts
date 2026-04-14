@@ -56,6 +56,7 @@ describe('settings', () => {
           listIndentSize: 4,
           lineNumbers: true,
           lineWrapping: false,
+          folding: true,
         })
       })
     })
@@ -75,6 +76,7 @@ describe('settings', () => {
           listIndentSize: 2,
           lineNumbers: false,
           lineWrapping: true,
+          folding: false,
         })
       })
     })
