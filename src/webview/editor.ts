@@ -1,7 +1,6 @@
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { markdown } from '@codemirror/lang-markdown'
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
-import { searchKeymap } from '@codemirror/search'
 import { Compartment, EditorState } from '@codemirror/state'
 import {
   drawSelection,
@@ -413,12 +412,7 @@ export const createEditor = (
         history(),
         drawSelection(),
         placeholder('Start typing your notes...'),
-        keymap.of([
-          ...mdKeymap,
-          ...searchKeymap,
-          ...defaultKeymap,
-          ...historyKeymap,
-        ]),
+        keymap.of([...mdKeymap, ...defaultKeymap, ...historyKeymap]),
         updateListener,
         markdownDecorations,
         tableAutoFormat,

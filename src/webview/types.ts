@@ -14,11 +14,7 @@ export type WebviewMessage =
   | { type: 'updateContent'; content: string }
   | { type: 'openLink'; url: string }
 
-export type MdpadCommand =
-  | 'toggleBold'
-  | 'toggleItalic'
-  | 'toggleStrikethrough'
-  | 'openSearch'
+export type MdpadCommand = 'toggleBold' | 'toggleItalic' | 'toggleStrikethrough'
 
 export interface MdpadSettings {
   fontFamily: string
@@ -33,3 +29,4 @@ export type ExtensionMessage =
   | { type: 'init'; content: string }
   | { type: 'command'; command: MdpadCommand }
   | ({ type: 'settings' } & MdpadSettings)
+  | { type: 'setCursor'; pos: number }

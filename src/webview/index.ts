@@ -1,5 +1,4 @@
 import './styles.css'
-import { openSearchPanel } from '@codemirror/search'
 import { createEditor, type EditorHandle, wrapSelection } from './editor'
 import type { ExtensionMessage } from './types'
 
@@ -64,14 +63,21 @@ const init = (): void => {
             case 'toggleStrikethrough':
               wrapSelection(editor.view, '~~')
               break
-            case 'openSearch':
-              openSearchPanel(editor.view)
-              break
           }
           break
         }
         case 'settings': {
           editor?.applySettings(message)
+          break
+        }
+        case 'setCursor': {
+          if (!editor) break
+          const pos = Math.min(message.pos, editor.view.state.doc.length)
+          editor.view.dispatch({
+            selection: { anchor: pos },
+            scrollIntoView: true,
+          })
+          editor.view.focus()
           break
         }
       }

@@ -3,6 +3,7 @@ import { deriveTitle } from './deriveTitle'
 import { NotesStorage } from './NotesStorage'
 import { PanelProvider } from './PanelProvider'
 import { SidebarProvider } from './SidebarProvider'
+import { searchLines } from './searchLines'
 import type { MdpadCommand, MdpadSettings } from './webview/types'
 
 export const activate = (context: vscode.ExtensionContext): void => {
@@ -255,6 +256,98 @@ export const activate = (context: vscode.ExtensionContext): void => {
     }),
   )
 
+  const debounceSearch = (fn: (query: string) => void, ms = 150) => {
+    let timer: ReturnType<typeof setTimeout> | undefined
+    return (query: string) => {
+      if (timer) clearTimeout(timer)
+      timer = setTimeout(() => fn(query), ms)
+    }
+  }
+
+  const sendCursorToActive = (pos: number) => {
+    const msg = { type: 'setCursor' as const, pos }
+    setTimeout(() => {
+      if (panelProvider.isActive) {
+        panelProvider.postMessage(msg)
+      } else {
+        sidebarProvider.postMessage(msg)
+      }
+    }, 50)
+  }
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('mdpad.searchPages', () => {
+      type SearchResult = vscode.QuickPickItem & {
+        pageId: string
+        scope: 'workspace' | 'global'
+        cursorPos: number
+      }
+
+      const qp = vscode.window.createQuickPick<SearchResult>()
+      qp.placeholder = 'Search across all pages...'
+
+      qp.onDidChangeValue(
+        debounceSearch(query => {
+          if (!query) {
+            qp.items = []
+            return
+          }
+          const results: SearchResult[] = []
+
+          const searchScope = (
+            storage: NotesStorage,
+            scope: 'workspace' | 'global',
+            icon: string,
+            scopeLabel: string,
+          ) => {
+            for (const page of storage.getState().pages) {
+              for (const match of searchLines(page.content, query)) {
+                results.push({
+                  label: `${icon} ${deriveTitle(page.content)}`,
+                  description: `${scopeLabel} · line ${match.lineNum}`,
+                  detail: match.line,
+                  pageId: page.id,
+                  scope,
+                  cursorPos: match.cursorPos,
+                  alwaysShow: true,
+                })
+              }
+            }
+          }
+
+          searchScope(
+            workspaceStorage,
+            'workspace',
+            '$(root-folder)',
+            'Workspace',
+          )
+          searchScope(globalStorage, 'global', '$(globe)', 'Global')
+          qp.items = results
+        }),
+      )
+
+      qp.onDidAccept(() => {
+        const picked = qp.selectedItems[0]
+        if (picked) {
+          if (picked.scope !== currentScope) {
+            currentScope = picked.scope
+            vscode.commands.executeCommand(
+              'setContext',
+              'mdpad.scope',
+              currentScope,
+            )
+          }
+          getActiveStorage().switchPage(picked.pageId)
+          switchAndUpdate()
+          sendCursorToActive(picked.cursorPos)
+        }
+        qp.dispose()
+      })
+      qp.onDidHide(() => qp.dispose())
+      qp.show()
+    }),
+  )
+
   const postCommandToActive = (command: MdpadCommand) => {
     if (panelProvider.isActive) {
       panelProvider.postCommand(command)
@@ -282,9 +375,41 @@ export const activate = (context: vscode.ExtensionContext): void => {
   )
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('mdpad.find', () =>
-      postCommandToActive('openSearch'),
-    ),
+    vscode.commands.registerCommand('mdpad.find', () => {
+      const state = getActiveStorage().getState()
+      const page = state.pages.find(p => p.id === state.activeId)
+      if (!page) return
+
+      type FindResult = vscode.QuickPickItem & { cursorPos: number }
+
+      const qp = vscode.window.createQuickPick<FindResult>()
+      qp.placeholder = 'Find in note...'
+
+      qp.onDidChangeValue(
+        debounceSearch(query => {
+          if (!query) {
+            qp.items = []
+            return
+          }
+          qp.items = searchLines(page.content, query).map(match => ({
+            label: match.line,
+            description: `line ${match.lineNum}`,
+            cursorPos: match.cursorPos,
+            alwaysShow: true,
+          }))
+        }),
+      )
+
+      qp.onDidAccept(() => {
+        const picked = qp.selectedItems[0]
+        if (picked) {
+          sendCursorToActive(picked.cursorPos)
+        }
+        qp.dispose()
+      })
+      qp.onDidHide(() => qp.dispose())
+      qp.show()
+    }),
   )
 
   context.subscriptions.push(

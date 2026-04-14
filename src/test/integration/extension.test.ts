@@ -19,6 +19,7 @@ suite('Extension', () => {
     'mdpad.exportPage',
     'mdpad.find',
     'mdpad.openSettings',
+    'mdpad.searchPages',
     'mdpad.switchToGlobal',
     'mdpad.switchToWorkspace',
     'mdpad.toggleBold',
