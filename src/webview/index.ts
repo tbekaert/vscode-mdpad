@@ -41,6 +41,9 @@ const init = (): void => {
     handleOpenLink,
   )
 
+  // Expose editor view for e2e tests
+  ;(window as unknown as { __mdpadView?: unknown }).__mdpadView = editor.view
+
   window.addEventListener(
     'message',
     (event: MessageEvent<ExtensionMessage>) => {

@@ -19,6 +19,12 @@ pnpm webpack-dev      # Build + watch mode
 pnpm lint             # Biome check on src/
 pnpm format           # Biome auto-fix on src/
 
+# Tests
+pnpm test:unit        # Mocha unit tests
+pnpm test:e2e         # Playwright e2e tests (webview + mocked VS Code API)
+pnpm test:e2e:ui      # Playwright UI mode for debugging
+pnpm test:integration # VS Code integration tests
+
 # Test in VS Code
 # Press F5 — launches extension host with the "watch" build task
 
@@ -52,6 +58,13 @@ Two webpack bundles from one config file:
 - `src/webview/toolbar.ts` — Page dropdown (titles derived from content), new/delete buttons.
 - `src/webview/styles.css` — All styles: layout, VS Code CSS variable mapping, decoration classes.
 - `src/webview/types.ts` — Shared types: Page, NotesState, MdpadSettings, message protocol.
+
+**E2E tests** (`src/test/e2e/`, target: browser via Playwright):
+- `harness.html` — standalone HTML with mocked `acquireVsCodeApi` that loads `dist/webview.js`. Used by Playwright tests to exercise the webview outside VS Code.
+- `utils.ts` — shared helpers: `initEditor`, `sendMessage`, `getPostedMessages`, `getCursorPos`, etc.
+- `*.spec.ts` — test files covering decorations, shortcuts, cursor navigation, and message protocol.
+
+The webview exposes its `EditorView` on `window.__mdpadView` for test inspection.
 
 ## Key Design Decision
 

@@ -10,3 +10,7 @@ dist
 .claude/plans/
 .superpowers/
 superpowers/
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/

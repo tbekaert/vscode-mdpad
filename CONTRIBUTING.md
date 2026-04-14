@@ -21,6 +21,8 @@ pnpm lint             # Biome check
 pnpm format           # Biome auto-fix
 pnpm compile          # TypeScript compile (for tests)
 pnpm test:unit        # Run unit tests
+pnpm test:e2e         # Run Playwright e2e tests (webview)
+pnpm test:e2e:ui      # Playwright UI mode for debugging
 pnpm test:integration # Run integration tests (launches VS Code)
 ```
 
