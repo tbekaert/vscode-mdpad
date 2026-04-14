@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
-import { focusEditor, initEditor } from './utils'
+import { focusEditor, getEditorContent, initEditor } from './utils'
 
-test.describe('shortcuts', () => {
+test.describe('shortcuts — wrapping', () => {
   test('Ctrl+B wraps selection with **', async ({ page }) => {
     await initEditor(page, 'hello')
     await focusEditor(page)
@@ -47,6 +47,35 @@ test.describe('shortcuts', () => {
     expect(content).toContain('==hello==')
   })
 
+  test('Ctrl+B with no selection inserts empty markers', async ({ page }) => {
+    await initEditor(page, 'hello')
+    await focusEditor(page)
+    await page.keyboard.press('End')
+    await page.keyboard.press('Control+b')
+    expect(await getEditorContent(page)).toBe('hello****')
+  })
+})
+
+test.describe('shortcuts — unwrapping', () => {
+  test('Ctrl+B unwraps already-bold selection', async ({ page }) => {
+    await initEditor(page, '**hello**')
+    await focusEditor(page)
+    await page.keyboard.press('Control+a')
+    await page.keyboard.press('Control+b')
+    expect(await getEditorContent(page)).toBe('hello')
+  })
+
+  test('Ctrl+I unwraps italic when cursor is inside', async ({ page }) => {
+    await initEditor(page, '*hello*')
+    await focusEditor(page)
+    await page.keyboard.press('Control+Home')
+    for (let i = 0; i < 3; i++) await page.keyboard.press('ArrowRight')
+    await page.keyboard.press('Control+i')
+    expect(await getEditorContent(page)).toBe('hello')
+  })
+})
+
+test.describe('shortcuts — headings', () => {
   test('Ctrl+Shift+H cycles heading level', async ({ page }) => {
     await initEditor(page, 'hello')
     await focusEditor(page)
@@ -59,23 +88,20 @@ test.describe('shortcuts', () => {
     expect(content2).toContain('## hello')
   })
 
-  test('Tab indents list item', async ({ page }) => {
-    await initEditor(page, '- first\n- second')
+  test('Ctrl+Shift+H cycles H1 → H2 → H3 → plain', async ({ page }) => {
+    await initEditor(page, 'text')
     await focusEditor(page)
-    await page.keyboard.press('Control+End')
-    await page.keyboard.press('Home')
-    await page.keyboard.press('Tab')
-    const content = await page.locator('.cm-content').textContent()
-    expect(content).toContain('  * second')
-  })
 
-  test('Shift+Tab outdents list item', async ({ page }) => {
-    await initEditor(page, '- first\n  * second')
-    await focusEditor(page)
-    await page.keyboard.press('Control+End')
-    await page.keyboard.press('Home')
-    await page.keyboard.press('Shift+Tab')
-    const content = await page.locator('.cm-content').textContent()
-    expect(content).toContain('- second')
+    await page.keyboard.press('Control+Shift+h')
+    expect(await getEditorContent(page)).toBe('# text')
+
+    await page.keyboard.press('Control+Shift+h')
+    expect(await getEditorContent(page)).toBe('## text')
+
+    await page.keyboard.press('Control+Shift+h')
+    expect(await getEditorContent(page)).toBe('### text')
+
+    await page.keyboard.press('Control+Shift+h')
+    expect(await getEditorContent(page)).toBe('text')
   })
 })

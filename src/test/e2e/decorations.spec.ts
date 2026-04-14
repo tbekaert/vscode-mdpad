@@ -1,5 +1,13 @@
 import { expect, test } from '@playwright/test'
-import { initEditor } from './utils'
+import { focusEditor, getEditorContent, initEditor } from './utils'
+
+const gotoLine = async (
+  page: import('@playwright/test').Page,
+  lineNum: number,
+) => {
+  await page.keyboard.press('Control+Home')
+  for (let i = 1; i < lineNum; i++) await page.keyboard.press('ArrowDown')
+}
 
 test.describe('decorations', () => {
   test('bold text gets mdpad-bold class', async ({ page }) => {
@@ -66,6 +74,49 @@ test.describe('decorations', () => {
     await initEditor(page, '- item')
     const bulletCount = await page.locator('.mdpad-list-bullet').count()
     expect(bulletCount).toBeGreaterThan(0)
+  })
+
+  test('numbered list marker is muted', async ({ page }) => {
+    await initEditor(page, '1. item')
+    const mutedCount = await page.locator('.mdpad-muted').count()
+    expect(mutedCount).toBeGreaterThan(0)
+  })
+
+  test('supports `)` suffix for ordered lists', async ({ page }) => {
+    await initEditor(page, '1) item')
+    const mutedCount = await page.locator('.mdpad-muted').count()
+    expect(mutedCount).toBeGreaterThan(0)
+  })
+
+  test('3-level nested ordered list has muted markers on all levels', async ({
+    page,
+  }) => {
+    await initEditor(page, '1. a\n2. b\n3. c')
+    await focusEditor(page)
+
+    await gotoLine(page, 2)
+    await page.keyboard.press('Tab')
+
+    await gotoLine(page, 3)
+    await page.keyboard.press('Tab')
+
+    await gotoLine(page, 3)
+    await page.keyboard.press('Tab')
+
+    const content = await getEditorContent(page)
+    expect(content).toBe('1. a\n  1. b\n    1. c')
+
+    const lines = await page.locator('.cm-line').all()
+    expect(lines.length).toBe(3)
+
+    for (let i = 0; i < 3; i++) {
+      const lineText = await lines[i].textContent()
+      const mutedInLine = await lines[i].locator('.mdpad-muted').count()
+      expect(
+        mutedInLine,
+        `line ${i + 1} (${lineText}) should have muted marker`,
+      ).toBeGreaterThan(0)
+    }
   })
 
   test('blockquote gets mdpad-blockquote class', async ({ page }) => {

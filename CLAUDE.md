@@ -62,7 +62,7 @@ Two webpack bundles from one config file:
 **E2E tests** (`src/test/e2e/`, target: browser via Playwright):
 - `harness.html` — standalone HTML with mocked `acquireVsCodeApi` that loads `dist/webview.js`. Used by Playwright tests to exercise the webview outside VS Code.
 - `utils.ts` — shared helpers: `initEditor`, `sendMessage`, `getPostedMessages`, `getCursorPos`, etc.
-- `*.spec.ts` — test files covering decorations, shortcuts, cursor navigation, and message protocol.
+- `*.spec.ts` — one file per feature domain (e.g. `lists.spec.ts`, `shortcuts.spec.ts`, `decorations.spec.ts`, `settings.spec.ts`). See conventions below.
 
 The webview exposes its `EditorView` on `window.__mdpadView` for test inspection.
 
@@ -95,3 +95,12 @@ Global notes can optionally be synced across devices via VS Code's Settings Sync
 - Biome for linting and formatting (via `@bekaert-dev/biome-config` shared preset).
 - Changesets for versioning: **every commit that changes user-facing behavior or fixes a bug MUST include a changeset file.** Run `pnpm changeset` to create one before committing. The release workflow creates a version PR on push to main, and publishes to both marketplaces on merge.
 - License: GPL-3.0-or-later.
+
+### E2E test organization
+
+- **One spec file per feature domain**, not per difficulty or depth. File name = feature (e.g. `lists.spec.ts` covers all list behavior: continuation, indent/outdent, ordered, tasks, deep nesting).
+- **Edge cases live in the same file** as the happy path, grouped under a `describe('<feature> — edge cases')` block. Do not create separate `*-edge-cases.spec.ts` files.
+- **Decoration/CSS-class assertions go in `decorations.spec.ts`** regardless of which markdown construct they test.
+- **Settings propagation goes in `settings.spec.ts`** (font, line numbers, list indent size, etc.), because it cuts across features. Feature-specific settings tests (e.g. the `folding` toggle) stay with the feature.
+- **Inter-process protocol tests go in `messaging.spec.ts`** (host ↔ webview messages, debounce, ready signal).
+- Inside a file, split tests into `describe('<feature> — <sub-area>')` blocks rather than splitting across files. Example: `lists.spec.ts` has describes for `basic indent/outdent shortcuts`, `continuation on Enter`, `unordered deep nesting`, `ordered indent/outdent`, `task lists`, `tab edge cases`.

@@ -23,14 +23,6 @@ test.describe('messaging', () => {
     expect(content).toContain('hello world')
   })
 
-  test('settings message applies font family', async ({ page }) => {
-    await initEditor(page, 'text', { fontFamily: 'monospace' })
-    const fontFamily = await page
-      .locator('.cm-content')
-      .evaluate(el => getComputedStyle(el).fontFamily)
-    expect(fontFamily).toContain('monospace')
-  })
-
   test('setCursor message moves cursor', async ({ page }) => {
     await initEditor(page, 'hello world')
     await sendMessage(page, { type: 'setCursor', pos: 5 })
