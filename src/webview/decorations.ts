@@ -29,22 +29,17 @@ const headingMarks: Record<number, Decoration> = {
   5: Decoration.mark({ class: 'mdpad-heading mdpad-heading-5' }),
   6: Decoration.mark({ class: 'mdpad-heading mdpad-heading-6' }),
 }
-const headingMutedMarks: Record<number, Decoration> = {
-  1: Decoration.mark({ class: 'mdpad-muted mdpad-heading mdpad-heading-1' }),
-  2: Decoration.mark({ class: 'mdpad-muted mdpad-heading mdpad-heading-2' }),
-  3: Decoration.mark({ class: 'mdpad-muted mdpad-heading mdpad-heading-3' }),
-  4: Decoration.mark({ class: 'mdpad-muted mdpad-heading mdpad-heading-4' }),
-  5: Decoration.mark({ class: 'mdpad-muted mdpad-heading mdpad-heading-5' }),
-  6: Decoration.mark({ class: 'mdpad-muted mdpad-heading mdpad-heading-6' }),
-}
+const headingPrefixMark = Decoration.mark({
+  class: 'mdpad-muted mdpad-heading',
+})
 
-const headingConfig: Record<string, { level: number; border: boolean }> = {
-  ATXHeading1: { level: 1, border: true },
-  ATXHeading2: { level: 2, border: true },
-  ATXHeading3: { level: 3, border: false },
-  ATXHeading4: { level: 4, border: false },
-  ATXHeading5: { level: 5, border: false },
-  ATXHeading6: { level: 6, border: false },
+const headingConfig: Record<string, number> = {
+  ATXHeading1: 1,
+  ATXHeading2: 2,
+  ATXHeading3: 3,
+  ATXHeading4: 4,
+  ATXHeading5: 5,
+  ATXHeading6: 6,
 }
 
 // ---------------------------------------------------------------------------
@@ -64,15 +59,10 @@ const decorateHeading = (
   const hashMatch = text.match(/^(#{1,6})\s/)
   if (hashMatch) {
     const prefixEnd = from + hashMatch[0].length
-    const cfg = headingConfig[name]
-    decorations.push(headingMutedMarks[cfg.level].range(from, prefixEnd))
+    const level = headingConfig[name]
+    decorations.push(headingPrefixMark.range(from, prefixEnd))
     if (prefixEnd < to) {
-      decorations.push(headingMarks[cfg.level].range(prefixEnd, to))
-    }
-    if (cfg.border) {
-      decorations.push(
-        Decoration.line({ class: 'mdpad-heading-border' }).range(from),
-      )
+      decorations.push(headingMarks[level].range(prefixEnd, to))
     }
   }
 }
@@ -314,6 +304,8 @@ const buildDecorations = (view: EditorView): DecorationSet => {
     }
   }
 
+  const listItemLines = new Set<number>()
+
   tree.iterate({
     enter(node) {
       const { from, to, name } = node
@@ -349,6 +341,7 @@ const buildDecorations = (view: EditorView): DecorationSet => {
       }
       if (name === 'ListItem') {
         decorateListItem(decorations, doc, from)
+        listItemLines.add(doc.lineAt(from).number)
         return
       }
       if (name === 'HorizontalRule') {
@@ -365,6 +358,14 @@ const buildDecorations = (view: EditorView): DecorationSet => {
       }
     },
   })
+
+  // Fallback: decorate list markers on lines the parser missed (deeply nested)
+  for (let i = 1; i <= doc.lines; i++) {
+    if (listItemLines.has(i)) continue
+    const line = doc.line(i)
+    if (frontmatterEnd >= 0 && line.from < frontmatterEnd) continue
+    decorateListItem(decorations, doc, line.from)
+  }
 
   // Frontmatter --- block at top of document
   if (doc.lines >= 3) {

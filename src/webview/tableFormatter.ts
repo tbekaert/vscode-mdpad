@@ -145,30 +145,29 @@ export const tableAutoFormat = ViewPlugin.fromClass(
     update(update: ViewUpdate): void {
       if (!update.docChanged || this.isFormatting) return
 
-      // Check if any change intersects a Table node
-      const tree = syntaxTree(update.state)
-      const _doc = update.state.doc
-      let tableFrom = -1
-      let _tableTo = -1
+      const changedRanges: { from: number; to: number }[] = []
+      update.changes.iterChanges((_fromA, _toA, fromB, toB) => {
+        changedRanges.push({ from: fromB, to: toB })
+      })
+      if (changedRanges.length === 0) return
 
-      // Find the table that contains the cursor
-      const cursor = update.state.selection.main.head
+      const tree = syntaxTree(update.state)
+      let foundTable = false
       tree.iterate({
         enter(node) {
-          if (
-            node.name === 'Table' &&
-            node.from <= cursor &&
-            node.to >= cursor
-          ) {
-            tableFrom = node.from
-            _tableTo = node.to
+          if (node.name !== 'Table') return undefined
+          for (const range of changedRanges) {
+            if (range.from <= node.to && range.to >= node.from) {
+              foundTable = true
+              return false
+            }
           }
+          return undefined
         },
       })
 
-      if (tableFrom === -1) return
+      if (!foundTable) return
 
-      // Debounce the format
       if (this.formatTimer) clearTimeout(this.formatTimer)
       this.formatTimer = setTimeout(() => {
         this.doFormat(update.view)
@@ -180,42 +179,49 @@ export const tableAutoFormat = ViewPlugin.fromClass(
       const doc = view.state.doc
       const cursor = view.state.selection.main.head
 
-      let currentFrom = -1
-      let currentTo = -1
+      const tables: { from: number; to: number }[] = []
       tree.iterate({
         enter(node) {
-          if (
-            node.name === 'Table' &&
-            node.from <= cursor &&
-            node.to >= cursor
-          ) {
-            currentFrom = node.from
-            currentTo = node.to
+          if (node.name === 'Table') {
+            tables.push({ from: node.from, to: node.to })
           }
         },
       })
 
-      if (currentFrom === -1) return
+      if (tables.length === 0) return
 
-      const tableText = doc.sliceString(currentFrom, currentTo)
-      const formatted = formatTable(tableText)
+      const changes: { from: number; to: number; insert: string }[] = []
+      let cursorTable: { from: number; to: number } | undefined
+      let formattedCursorTable: string | undefined
 
-      if (!formatted || formatted === tableText) return
+      for (const table of tables) {
+        const tableText = doc.sliceString(table.from, table.to)
+        const formatted = formatTable(tableText)
+        if (!formatted || formatted === tableText) continue
+        changes.push({ from: table.from, to: table.to, insert: formatted })
+        if (table.from <= cursor && table.to >= cursor) {
+          cursorTable = table
+          formattedCursorTable = formatted
+        }
+      }
 
-      const cursorOffset = cursor - currentFrom
-      const newCursorPos = mapCursorPosition(
-        tableText,
-        formatted,
-        cursorOffset,
-        currentFrom,
-      )
+      if (changes.length === 0) return
+
+      let newCursorPos = cursor
+      if (cursorTable && formattedCursorTable) {
+        const cursorOffset = cursor - cursorTable.from
+        newCursorPos = mapCursorPosition(
+          doc.sliceString(cursorTable.from, cursorTable.to),
+          formattedCursorTable,
+          cursorOffset,
+          cursorTable.from,
+        )
+      }
 
       this.isFormatting = true
       view.dispatch({
-        changes: { from: currentFrom, to: currentTo, insert: formatted },
-        selection: {
-          anchor: Math.min(newCursorPos, currentFrom + formatted.length),
-        },
+        changes,
+        selection: { anchor: newCursorPos },
       })
       this.isFormatting = false
     }

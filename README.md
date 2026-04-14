@@ -79,7 +79,6 @@ Collapse H2 and H3 sections and frontmatter blocks (enable via `mdpad.folding` s
 | ------- | ------- | ----------- |
 | `mdpad.fontFamily` | `"inherit"` | Font family. `"inherit"` uses the VS Code theme font. |
 | `mdpad.lineHeight` | `1.6` | Line height in the editor. |
-| `mdpad.headingScale` | `"Major Third (1.250)"` | Typographic scale ratio for heading sizes. |
 | `mdpad.lineWrapping` | `true` | Wrap long lines. |
 | `mdpad.folding` | `false` | Enable section folding for H2, H3, and frontmatter. |
 | `mdpad.listIndentSize` | `2` | Spaces per list indent level. |
@@ -113,6 +112,18 @@ Headings, bold, italic, strikethrough, links, blockquotes, task lists, fenced co
 ### Theme-aware
 
 Adapts to any VS Code color theme — dark, light, or high contrast.
+
+## Known Limitations
+
+### Uniform line heights
+
+All lines in the editor share the same height. Headings are distinguished by bold weight, not font size. Inline code and code blocks use a monospace font but at the same size as body text.
+
+This is a deliberate constraint: CodeMirror's vertical cursor navigation (arrow keys) uses pixel-based calculations that break when lines have different heights (from varying font sizes, padding, or margins). The issue becomes noticeable when scrolled — the cursor can jump multiple lines or land in the wrong position.
+
+### Code block fence editing
+
+Clicking on a fenced code block delimiter (` ``` `) may snap the cursor inside the code block rather than onto the fence line itself. This is a CodeMirror behavior related to how nested language parsers handle the boundary between the fence and the code content. You can still edit fences by placing the cursor with arrow keys.
 
 ## Contributing
 

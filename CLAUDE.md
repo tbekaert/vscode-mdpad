@@ -57,6 +57,8 @@ Two webpack bundles from one config file:
 
 **Muted-syntax, not hidden-syntax.** All markdown characters stay visible but dimmed using `--vscode-editorLineNumber-foreground`. No widget replacements, no raw mode toggle. This avoids layout jumps, cursor issues, and CPU spikes from the original Typora-style approach.
 
+**Uniform line heights.** All lines must have the same height — no per-line `font-size`, `line-height`, `padding`, `margin`, or `border` that would change a line's height. CodeMirror's vertical cursor navigation (arrow keys) uses pixel-based calculations that break with inconsistent line heights, especially when scrolled. Headings are distinguished by `font-weight` only, not size. Inline code and code blocks use monospace font but no size change.
+
 ## Settings Sync
 
 Global notes can optionally be synced across devices via VS Code's Settings Sync (`context.globalState.setKeysForSync`). This is **opt-in** (disabled by default via `mdpad.syncGlobalNotes`) because there is no VS Code API to remove data from the sync remote once it's been synced. Disabling the setting stops future syncing but does not delete already-synced data.

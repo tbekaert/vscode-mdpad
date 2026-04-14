@@ -19,7 +19,6 @@ export type MdpadCommand = 'toggleBold' | 'toggleItalic' | 'toggleStrikethrough'
 export interface MdpadSettings {
   fontFamily: string
   lineHeight: number
-  headingScale: number
   listIndentSize: number
   lineNumbers: boolean
   lineWrapping: boolean
