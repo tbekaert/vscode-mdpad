@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { initEditor } from './utils'
+import { initEditor, sendMessage, DEFAULT_SETTINGS } from './utils'
 
 test.describe('folding', () => {
   test('fold chevron appears on H2 when folding is enabled', async ({
@@ -37,5 +37,89 @@ test.describe('folding', () => {
     })
     const count = await page.locator('.mdpad-foldable').count()
     expect(count).toBeGreaterThan(0)
+  })
+
+  test.describe('lifecycle', () => {
+    // Regression guard for inlineFoldWidgets.destroy(): toggling folding on
+    // and off must call removeEventListener for every addEventListener made
+    // by a now-discarded plugin instance. Without destroy(), handlers leak.
+    test('toggling folding off then on does not leak click listeners', async ({
+      page,
+    }) => {
+      await initEditor(page, '## section\n\ncontent here\n\nmore content', {
+        folding: true,
+      })
+
+      // Patch add/removeEventListener on .cm-editor (the element view.dom
+      // points at) so we can count active click listeners across cycles.
+      await page.evaluate(() => {
+        const w = window as unknown as {
+          __clickAdds: number
+          __clickRemoves: number
+        }
+        w.__clickAdds = 0
+        w.__clickRemoves = 0
+        const editorDom = document.querySelector('.cm-editor') as HTMLElement
+        const origAdd = editorDom.addEventListener.bind(editorDom)
+        const origRemove = editorDom.removeEventListener.bind(editorDom)
+        editorDom.addEventListener = ((
+          type: string,
+          listener: EventListenerOrEventListenerObject,
+          options?: boolean | AddEventListenerOptions,
+        ) => {
+          if (type === 'click') w.__clickAdds++
+          return origAdd(type, listener, options)
+        }) as typeof editorDom.addEventListener
+        editorDom.removeEventListener = ((
+          type: string,
+          listener: EventListenerOrEventListenerObject,
+          options?: boolean | EventListenerOptions,
+        ) => {
+          if (type === 'click') w.__clickRemoves++
+          return origRemove(type, listener, options)
+        }) as typeof editorDom.removeEventListener
+      })
+
+      // Cycle the folding setting. Each off→on pair should produce:
+      //   +1 add (enable builds a new plugin instance)
+      //   +1 remove (disable destroys the previous instance)
+      const cycles = 3
+      for (let i = 0; i < cycles; i++) {
+        await sendMessage(page, {
+          type: 'settings',
+          ...DEFAULT_SETTINGS,
+          folding: false,
+        })
+        await sendMessage(page, {
+          type: 'settings',
+          ...DEFAULT_SETTINGS,
+          folding: true,
+        })
+      }
+
+      const counts = await page.evaluate(() => {
+        const w = window as unknown as {
+          __clickAdds: number
+          __clickRemoves: number
+        }
+        return { adds: w.__clickAdds, removes: w.__clickRemoves }
+      })
+
+      // Each enable attaches one listener; each disable must detach one.
+      expect(counts.adds).toBe(cycles)
+      expect(counts.removes).toBe(cycles)
+    })
+
+    test('disabling folding removes fold chevrons', async ({ page }) => {
+      await initEditor(page, '## section\n\ncontent here', { folding: true })
+      expect(await page.locator('.mdpad-foldable').count()).toBeGreaterThan(0)
+
+      await sendMessage(page, {
+        type: 'settings',
+        ...DEFAULT_SETTINGS,
+        folding: false,
+      })
+      await expect(page.locator('.mdpad-foldable')).toHaveCount(0)
+    })
   })
 })

@@ -26,7 +26,11 @@ export const handleWebviewMessage = (
         const fileUri = vscode.Uri.joinPath(workspaceFolder.uri, url)
         vscode.workspace.openTextDocument(fileUri).then(
           doc => vscode.window.showTextDocument(doc),
-          () => {},
+          err => {
+            vscode.window.showErrorMessage(
+              `mdpad: could not open ${url} — ${err instanceof Error ? err.message : String(err)}`,
+            )
+          },
         )
       }
       break

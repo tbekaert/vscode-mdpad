@@ -162,4 +162,67 @@ describe('listIndent', () => {
       assert.strictEqual(view2.state.doc.toString(), '1. a\n2. b\n3. c')
     })
   })
+
+  describe('ordered list renumber — edge cases', () => {
+    it('indent across a blank line breaks sibling renumbering', () => {
+      // Blank line ends the list as far as the renumber scan is concerned:
+      // lines after the break keep their original numbers.
+      const doc = '1. a\n2. b\n\n3. c'
+      const view = createView(doc, cursorOnLine(doc, 2))
+      indentList(view)
+      assert.strictEqual(view.state.doc.toString(), '1. a\n  1. b\n\n3. c')
+    })
+
+    it('indent of first item renumbers all remaining siblings down', () => {
+      const doc = '1. a\n2. b\n3. c'
+      const view = createView(doc, cursorOnLine(doc, 1))
+      indentList(view)
+      assert.strictEqual(view.state.doc.toString(), '  1. a\n1. b\n2. c')
+    })
+
+    it('indent preserves a non-1 starting number when it joins an existing sublist', () => {
+      // Existing sublist already has items 1..2; indenting a new item into
+      // that sublist appends as 3.
+      const doc = '1. parent\n  1. child a\n  2. child b\n2. sibling'
+      const view = createView(doc, cursorOnLine(doc, 4))
+      indentList(view)
+      assert.strictEqual(
+        view.state.doc.toString(),
+        '1. parent\n  1. child a\n  2. child b\n  3. sibling',
+      )
+    })
+
+    it('outdent from deeply nested sublist promotes correctly', () => {
+      const doc = '1. a\n  1. b\n    1. c'
+      const view = createView(doc, cursorOnLine(doc, 3))
+      outdentList(view)
+      assert.strictEqual(view.state.doc.toString(), '1. a\n  1. b\n  2. c')
+    })
+
+    it('indent with `)` suffix preserves `)` on renumbered siblings', () => {
+      const doc = '1) a\n2) b\n3) c'
+      const view = createView(doc, cursorOnLine(doc, 2))
+      indentList(view)
+      assert.strictEqual(view.state.doc.toString(), '1) a\n  1) b\n2) c')
+    })
+
+    it('indent stops renumbering at a non-list line', () => {
+      const doc = '1. a\n2. b\ntext\n3. c'
+      const view = createView(doc, cursorOnLine(doc, 2))
+      indentList(view)
+      // The `3. c` line after plain text is a separate list — it should not
+      // be renumbered as a sibling of `1. a`.
+      assert.strictEqual(
+        view.state.doc.toString(),
+        '1. a\n  1. b\ntext\n3. c',
+      )
+    })
+
+    it('outdent of a singleton sublist does not corrupt its parent numbering', () => {
+      const doc = '1. a\n  1. b\n2. c'
+      const view = createView(doc, cursorOnLine(doc, 2))
+      outdentList(view)
+      assert.strictEqual(view.state.doc.toString(), '1. a\n2. b\n3. c')
+    })
+  })
 })

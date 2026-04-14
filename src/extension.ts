@@ -239,11 +239,17 @@ export const activate = (context: vscode.ExtensionContext): void => {
         filters: { Markdown: ['md'] },
       })
       if (uri) {
-        await vscode.workspace.fs.writeFile(
-          uri,
-          Buffer.from(page.content, 'utf-8'),
-        )
-        vscode.window.showInformationMessage(`Exported to ${uri.fsPath}`)
+        try {
+          await vscode.workspace.fs.writeFile(
+            uri,
+            Buffer.from(page.content, 'utf-8'),
+          )
+          vscode.window.showInformationMessage(`Exported to ${uri.fsPath}`)
+        } catch (err) {
+          vscode.window.showErrorMessage(
+            `mdpad: export failed — ${err instanceof Error ? err.message : String(err)}`,
+          )
+        }
       }
     }),
   )

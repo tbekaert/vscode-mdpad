@@ -115,4 +115,33 @@ describe('deriveTitle', () => {
   it('handles frontmatter with only delimiters', () => {
     assert.strictEqual(deriveTitle('---\n---\n# After'), 'After')
   })
+
+  describe('malformed frontmatter', () => {
+    // Unterminated frontmatter without `title:` — skipFrontmatter can't find
+    // a closer and returns the whole doc, so the `---` line is reported as
+    // the title fallback. Pinning this behaviour so a future refactor can't
+    // silently drift.
+    it('unterminated frontmatter without title falls back to the --- line', () => {
+      assert.strictEqual(
+        deriveTitle('---\nkey: v\nbody text'),
+        '---',
+      )
+    })
+
+    it('two-line doc starting with --- is not treated as frontmatter', () => {
+      // length < 3 short-circuits the scan, so the first non-empty line wins
+      assert.strictEqual(deriveTitle('---\nbody'), '---')
+    })
+
+    it('frontmatter closer with no content between fences returns "Empty note"', () => {
+      assert.strictEqual(deriveTitle('---\n---\n'), 'Empty note')
+    })
+
+    it('frontmatter title field with no value after whitespace falls through', () => {
+      assert.strictEqual(
+        deriveTitle('---\ntitle:\n---\nbody'),
+        'body',
+      )
+    })
+  })
 })

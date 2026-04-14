@@ -1,5 +1,5 @@
 import { syntaxTree } from '@codemirror/language'
-import type { Range } from '@codemirror/state'
+import type { Range, Text } from '@codemirror/state'
 import {
   Decoration,
   type DecorationSet,
@@ -7,6 +7,7 @@ import {
   ViewPlugin,
   type ViewUpdate,
 } from '@codemirror/view'
+import { findFrontmatterEndLine } from './frontmatter'
 import { olPattern, ulPattern } from './listPatterns'
 
 // ---------------------------------------------------------------------------
@@ -46,7 +47,15 @@ const headingConfig: Record<string, number> = {
 // Per-node-type decoration helpers
 // ---------------------------------------------------------------------------
 
-import type { Text } from '@codemirror/state'
+const linkPattern = /^\[(.+?)\]\((.+?)\)$/
+const taskListPattern = /^(\s*[-*+]\s+)\[([ xX])\]\s/
+const blockquotePrefixPattern = /^>\s?/
+const tableSeparatorPattern = /^\|?[\s-:|]+\|?$/
+const headingPattern = /^(#{1,6})\s/
+const highlightPattern = /==(.*?)==/g
+const checkedBoxPattern = /\[(x|X)\]/
+const uncheckedBoxPattern = /\[ \]/
+const inlineLinkPattern = /\[.+?\]\((.+?)\)/
 
 const decorateHeading = (
   decorations: Range<Decoration>[],
@@ -56,7 +65,7 @@ const decorateHeading = (
   name: string,
 ): void => {
   const text = doc.sliceString(from, to)
-  const hashMatch = text.match(/^(#{1,6})\s/)
+  const hashMatch = text.match(headingPattern)
   if (hashMatch) {
     const prefixEnd = from + hashMatch[0].length
     const level = headingConfig[name]
@@ -130,7 +139,7 @@ const decorateLink = (
   to: number,
 ): void => {
   const text = doc.sliceString(from, to)
-  const match = text.match(/^\[(.+?)\]\((.+?)\)$/)
+  const match = text.match(linkPattern)
   if (match) {
     const textEnd = from + 1 + match[1].length
     decorations.push(muted.range(from, from + 1))
@@ -154,7 +163,7 @@ const decorateBlockquote = (
     decorations.push(
       Decoration.line({ class: 'mdpad-blockquote' }).range(line.from),
     )
-    const bqMatch = line.text.match(/^>\s?/)
+    const bqMatch = line.text.match(blockquotePrefixPattern)
     if (bqMatch) {
       decorations.push(muted.range(line.from, line.from + bqMatch[0].length))
     }
@@ -169,7 +178,7 @@ const decorateListItem = (
   from: number,
 ): void => {
   const line = doc.lineAt(from)
-  const taskMatch = line.text.match(/^(\s*[-*+]\s+)\[([ xX])\]\s/)
+  const taskMatch = line.text.match(taskListPattern)
   if (taskMatch) {
     const dashEnd = line.from + taskMatch[1].length
     const bracketStart = dashEnd
@@ -262,7 +271,7 @@ const decorateTable = (
     const line = doc.line(i)
     const lineText = line.text
 
-    const isSeparator = /^\|?[\s-:|]+\|?$/.test(lineText)
+    const isSeparator = tableSeparatorPattern.test(lineText)
 
     if (isSeparator) {
       decorations.push(muted.range(line.from, line.to))
@@ -294,15 +303,9 @@ const buildDecorations = (view: EditorView): DecorationSet => {
   const doc = view.state.doc
 
   // Determine frontmatter boundary to skip tree decorations inside it
-  let frontmatterEnd = -1
-  if (doc.lines >= 3 && doc.line(1).text.trim() === '---') {
-    for (let i = 2; i <= doc.lines; i++) {
-      if (doc.line(i).text.trim() === '---') {
-        frontmatterEnd = doc.line(i).to
-        break
-      }
-    }
-  }
+  const frontmatterEndLine = findFrontmatterEndLine(doc)
+  const frontmatterEnd =
+    frontmatterEndLine > 0 ? doc.line(frontmatterEndLine).to : -1
 
   const listItemLines = new Set<number>()
 
@@ -368,26 +371,23 @@ const buildDecorations = (view: EditorView): DecorationSet => {
   }
 
   // Frontmatter --- block at top of document
-  if (doc.lines >= 3) {
+  if (frontmatterEndLine > 0) {
     const firstLine = doc.line(1)
-    if (firstLine.text.trim() === '---') {
-      decorations.push(muted.range(firstLine.from, firstLine.to))
-      for (let i = 2; i <= doc.lines; i++) {
-        const line = doc.line(i)
-        if (line.text.trim() === '---') {
-          decorations.push(muted.range(line.from, line.to))
-          break
-        }
-        const colonIdx = line.text.indexOf(':')
-        if (colonIdx !== -1 && line.from < line.to) {
-          decorations.push(muted.range(line.from, line.from + colonIdx + 1))
-        }
+    decorations.push(muted.range(firstLine.from, firstLine.to))
+    for (let i = 2; i <= frontmatterEndLine; i++) {
+      const line = doc.line(i)
+      if (i === frontmatterEndLine) {
+        decorations.push(muted.range(line.from, line.to))
+        break
+      }
+      const colonIdx = line.text.indexOf(':')
+      if (colonIdx !== -1 && line.from < line.to) {
+        decorations.push(muted.range(line.from, line.from + colonIdx + 1))
       }
     }
   }
 
   // Highlight ==text== (not a GFM node, requires regex pass)
-  const highlightPattern = /==(.*?)==/g
   for (let i = 1; i <= doc.lines; i++) {
     const line = doc.line(i)
     highlightPattern.lastIndex = 0
@@ -465,14 +465,11 @@ export const attachClickHandlers = (
       const line = view.state.doc.lineAt(pos)
       const lineText = line.text
 
-      const checkedPattern = /\[(x|X)\]/
-      const uncheckedPattern = /\[ \]/
-
       let newText: string
-      if (checkedPattern.test(lineText)) {
-        newText = lineText.replace(checkedPattern, '[ ]')
-      } else if (uncheckedPattern.test(lineText)) {
-        newText = lineText.replace(uncheckedPattern, '[x]')
+      if (checkedBoxPattern.test(lineText)) {
+        newText = lineText.replace(checkedBoxPattern, '[ ]')
+      } else if (uncheckedBoxPattern.test(lineText)) {
+        newText = lineText.replace(uncheckedBoxPattern, '[x]')
       } else {
         return
       }
@@ -499,7 +496,7 @@ export const attachClickHandlers = (
       const lineText = line.text
 
       // Find the link URL in the line
-      const linkMatch = lineText.match(/\[.+?\]\((.+?)\)/)
+      const linkMatch = lineText.match(inlineLinkPattern)
       if (linkMatch) {
         onOpenLink(linkMatch[1])
       }
