@@ -53,6 +53,7 @@ describe('settings', () => {
         handle.applySettings({
           fontFamily: 'monospace',
           lineHeight: 1.8,
+          headingScale: 1.333,
           listIndentSize: 4,
           lineNumbers: true,
           lineWrapping: false,
@@ -73,6 +74,7 @@ describe('settings', () => {
         handle.applySettings({
           fontFamily: 'inherit',
           lineHeight: 1.6,
+          headingScale: 1.25,
           listIndentSize: 2,
           lineNumbers: false,
           lineWrapping: true,
