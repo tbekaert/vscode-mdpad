@@ -19,6 +19,12 @@ pnpm webpack-dev      # Build + watch mode
 pnpm lint             # Biome check on src/
 pnpm format           # Biome auto-fix on src/
 
+# Tests
+pnpm test:unit        # Mocha unit tests
+pnpm test:e2e         # Playwright e2e tests (webview + mocked VS Code API)
+pnpm test:e2e:ui      # Playwright UI mode for debugging
+pnpm test:integration # VS Code integration tests
+
 # Test in VS Code
 # Press F5 — launches extension host with the "watch" build task
 
@@ -53,6 +59,13 @@ Two webpack bundles from one config file:
 - `src/webview/styles.css` — All styles: layout, VS Code CSS variable mapping, decoration classes.
 - `src/webview/types.ts` — Shared types: Page, NotesState, MdpadSettings, message protocol.
 
+**E2E tests** (`src/test/e2e/`, target: browser via Playwright):
+- `harness.html` — standalone HTML with mocked `acquireVsCodeApi` that loads `dist/webview.js`. Used by Playwright tests to exercise the webview outside VS Code.
+- `utils.ts` — shared helpers: `initEditor`, `sendMessage`, `getPostedMessages`, `getCursorPos`, etc.
+- `*.spec.ts` — one file per feature domain (e.g. `lists.spec.ts`, `shortcuts.spec.ts`, `decorations.spec.ts`, `settings.spec.ts`). See conventions below.
+
+The webview exposes its `EditorView` on `window.__mdpadView` for test inspection.
+
 ## Key Design Decision
 
 **Muted-syntax, not hidden-syntax.** All markdown characters stay visible but dimmed using `--vscode-editorLineNumber-foreground`. No widget replacements, no raw mode toggle. This avoids layout jumps, cursor issues, and CPU spikes from the original Typora-style approach.
@@ -82,3 +95,12 @@ Global notes can optionally be synced across devices via VS Code's Settings Sync
 - Biome for linting and formatting (via `@bekaert-dev/biome-config` shared preset).
 - Changesets for versioning: **every commit that changes user-facing behavior or fixes a bug MUST include a changeset file.** Run `pnpm changeset` to create one before committing. The release workflow creates a version PR on push to main, and publishes to both marketplaces on merge.
 - License: GPL-3.0-or-later.
+
+### E2E test organization
+
+- **One spec file per feature domain**, not per difficulty or depth. File name = feature (e.g. `lists.spec.ts` covers all list behavior: continuation, indent/outdent, ordered, tasks, deep nesting).
+- **Edge cases live in the same file** as the happy path, grouped under a `describe('<feature> — edge cases')` block. Do not create separate `*-edge-cases.spec.ts` files.
+- **Decoration/CSS-class assertions go in `decorations.spec.ts`** regardless of which markdown construct they test.
+- **Settings propagation goes in `settings.spec.ts`** (font, line numbers, list indent size, etc.), because it cuts across features. Feature-specific settings tests (e.g. the `folding` toggle) stay with the feature.
+- **Inter-process protocol tests go in `messaging.spec.ts`** (host ↔ webview messages, debounce, ready signal).
+- Inside a file, split tests into `describe('<feature> — <sub-area>')` blocks rather than splitting across files. Example: `lists.spec.ts` has describes for `basic indent/outdent shortcuts`, `continuation on Enter`, `unordered deep nesting`, `ordered indent/outdent`, `task lists`, `tab edge cases`.
