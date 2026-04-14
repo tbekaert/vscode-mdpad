@@ -110,6 +110,11 @@ body {
 .mdpad-strike {
   text-decoration: line-through;
 }
+.mdpad-highlight {
+  background: rgba(255, 213, 0, 0.25);
+  border-radius: 2px;
+  padding: 0.1em 0;
+}
 .mdpad-inline-code {
   font-family: var(--vscode-editor-font-family, monospace);
   font-size: 85%;

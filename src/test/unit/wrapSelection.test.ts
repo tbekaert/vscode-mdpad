@@ -65,4 +65,24 @@ describe('wrapSelection', () => {
       assert.strictEqual(view.state.doc.toString(), 'hello')
     })
   })
+
+  describe('with == (highlight)', () => {
+    it('wraps selected text', () => {
+      const view = createView('hello world', 0, 5)
+      wrapSelection(view, '==')
+      assert.strictEqual(view.state.doc.toString(), '==hello== world')
+    })
+
+    it('unwraps when selection includes markers', () => {
+      const view = createView('==hello==', 0, 9)
+      wrapSelection(view, '==')
+      assert.strictEqual(view.state.doc.toString(), 'hello')
+    })
+
+    it('unwraps when cursor is between markers', () => {
+      const view = createView('==hello==', 4)
+      wrapSelection(view, '==')
+      assert.strictEqual(view.state.doc.toString(), 'hello')
+    })
+  })
 })

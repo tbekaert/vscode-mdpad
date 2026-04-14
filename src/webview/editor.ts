@@ -213,6 +213,7 @@ const mdKeymap: KeyBinding[] = [
   { key: 'Ctrl-i', run: view => wrapSelection(view, '*') },
   { key: 'Ctrl-Shift-x', run: view => wrapSelection(view, '~~') },
   { key: 'Ctrl-Shift-`', run: view => wrapSelection(view, '`') },
+  { key: 'Ctrl-Shift-e', run: view => wrapSelection(view, '==') },
   { key: 'Ctrl-Shift-h', run: toggleHeading },
   { key: 'Tab', run: indentList },
   { key: 'Shift-Tab', run: outdentList },
