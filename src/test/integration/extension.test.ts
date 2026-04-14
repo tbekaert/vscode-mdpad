@@ -25,6 +25,9 @@ suite('Extension', () => {
     'mdpad.toggleBold',
     'mdpad.toggleItalic',
     'mdpad.toggleStrikethrough',
+    'mdpad.toggleCode',
+    'mdpad.toggleHighlight',
+    'mdpad.toggleHeading',
   ]
 
   for (const cmd of expectedCommands) {

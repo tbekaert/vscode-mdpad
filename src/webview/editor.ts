@@ -244,15 +244,24 @@ export const toggleHeading = (view: EditorView): boolean => {
   return true
 }
 
+// Formatting shortcuts (bold, italic, strike, code, highlight, heading) are
+// routed through the VS Code extension host via package.json keybindings and
+// the MdpadCommand message protocol, so they work uniformly as Cmd/Ctrl+letter
+// on both macOS and Windows/Linux. Only list-structural keys stay local.
 const mdKeymap: KeyBinding[] = [
-  { key: 'Ctrl-b', run: view => wrapSelection(view, '**') },
-  { key: 'Ctrl-i', run: view => wrapSelection(view, '*') },
-  { key: 'Ctrl-Shift-x', run: view => wrapSelection(view, '~~') },
-  { key: 'Ctrl-Shift-`', run: view => wrapSelection(view, '`') },
-  { key: 'Ctrl-Shift-e', run: view => wrapSelection(view, '==') },
-  { key: 'Ctrl-Shift-h', run: toggleHeading },
   { key: 'Tab', run: indentList },
   { key: 'Shift-Tab', run: outdentList },
+]
+
+// CodeMirror's defaultKeymap binds `Mod-i` to `selectParentSyntax`, which
+// expands the selection to the parent syntax node. When Cmd/Ctrl+I is pressed,
+// the VS Code keybinding fires `mdpad.toggleItalic` (routed through the host),
+// but the keydown *also* reaches CodeMirror and runs `selectParentSyntax`
+// first — so by the time our `wrapSelection` message arrives, the selection
+// has already been widened and we end up italicising a whole line. Swallow
+// the binding at the highest precedence to keep CodeMirror out of the way.
+const mdDisabledDefaults: KeyBinding[] = [
+  { key: 'Mod-i', run: () => true, preventDefault: true },
 ]
 
 const mdHighPrecedenceKeymap: KeyBinding[] = [
@@ -649,6 +658,7 @@ export const createEditor = (
             return span
           },
         }),
+        Prec.highest(keymap.of(mdDisabledDefaults)),
         Prec.highest(keymap.of(mdHighPrecedenceKeymap)),
         keymap.of([...mdKeymap, ...defaultKeymap, ...historyKeymap]),
         updateListener,

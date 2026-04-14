@@ -134,6 +134,21 @@
         "command": "mdpad.toggleStrikethrough",
         "title": "Toggle Strikethrough",
         "category": "mdpad"
+      },
+      {
+        "command": "mdpad.toggleCode",
+        "title": "Toggle Inline Code",
+        "category": "mdpad"
+      },
+      {
+        "command": "mdpad.toggleHighlight",
+        "title": "Toggle Highlight",
+        "category": "mdpad"
+      },
+      {
+        "command": "mdpad.toggleHeading",
+        "title": "Cycle Heading Level",
+        "category": "mdpad"
       }
     ],
     "menus": {
@@ -201,6 +216,42 @@
       ]
     },
     "keybindings": [
+      {
+        "command": "mdpad.toggleBold",
+        "key": "ctrl+b",
+        "mac": "cmd+b",
+        "when": "mdpad.focused"
+      },
+      {
+        "command": "mdpad.toggleItalic",
+        "key": "ctrl+i",
+        "mac": "cmd+i",
+        "when": "mdpad.focused"
+      },
+      {
+        "command": "mdpad.toggleStrikethrough",
+        "key": "ctrl+d",
+        "mac": "cmd+d",
+        "when": "mdpad.focused"
+      },
+      {
+        "command": "mdpad.toggleCode",
+        "key": "ctrl+k",
+        "mac": "cmd+k",
+        "when": "mdpad.focused"
+      },
+      {
+        "command": "mdpad.toggleHighlight",
+        "key": "ctrl+e",
+        "mac": "cmd+e",
+        "when": "mdpad.focused"
+      },
+      {
+        "command": "mdpad.toggleHeading",
+        "key": "ctrl+h",
+        "mac": "cmd+h",
+        "when": "mdpad.focused"
+      },
       {
         "command": "mdpad.find",
         "key": "ctrl+f",

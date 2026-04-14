@@ -60,18 +60,24 @@ Collapse H2 and H3 sections and frontmatter blocks (enable via `mdpad.folding` s
 
 ### Keyboard shortcuts
 
-| Action        | Mac              | Windows/Linux    |
-| ------------- | ---------------- | ---------------- |
-| Bold          | `Ctrl+B`         | `Ctrl+B`         |
-| Italic        | `Ctrl+I`       | `Ctrl+I`       |
-| Strikethrough | `Ctrl+Shift+X` | `Ctrl+Shift+X` |
-| Inline code   | `` Ctrl+Shift+` `` | `` Ctrl+Shift+` `` |
-| Highlight     | `Ctrl+Shift+E` | `Ctrl+Shift+E` |
-| Heading cycle | `Ctrl+Shift+H` | `Ctrl+Shift+H` |
-| Find          | `Cmd+F`        | `Ctrl+F`       |
-| Search pages  | `Cmd+Shift+F`  | `Ctrl+Shift+F` |
-| Indent list   | `Tab`          | `Tab`          |
-| Outdent list  | `Shift+Tab`    | `Shift+Tab`    |
+| Action        | Mac           | Windows/Linux  |
+| ------------- | ------------- | -------------- |
+| Bold          | `Cmd+B`       | `Ctrl+B`       |
+| Italic        | `Cmd+I`       | `Ctrl+I`       |
+| Strikethrough | `Cmd+D`       | `Ctrl+D`       |
+| Inline code   | `Cmd+K`       | `Ctrl+K`       |
+| Highlight     | `Cmd+E`       | `Ctrl+E`       |
+| Heading cycle | `Cmd+H`       | `Ctrl+H`       |
+| Find          | `Cmd+F`       | `Ctrl+F`       |
+| Search pages  | `Cmd+Shift+F` | `Ctrl+Shift+F` |
+| Indent list   | `Tab`         | `Tab`          |
+| Outdent list  | `Shift+Tab`   | `Shift+Tab`    |
+| Move line up  | `Alt+↑`       | `Alt+↑`        |
+| Move line down | `Alt+↓`      | `Alt+↓`        |
+| Copy line up  | `Shift+Alt+↑` | `Shift+Alt+↑`  |
+| Copy line down | `Shift+Alt+↓` | `Shift+Alt+↓` |
+
+All formatting shortcuts are also available as `mdpad: …` commands in the VS Code command palette and can be rebound from **Keyboard Shortcuts** (they are scoped to `when: mdpad.focused`, so they only fire when the mdpad editor has focus).
 
 ### Settings
 

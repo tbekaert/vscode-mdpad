@@ -38,7 +38,7 @@ pnpm changeset status  # Show pending changesets
 Two webpack bundles from one config file:
 
 **Extension host** (`dist/extension.js`, target: node):
-- `src/extension.ts` — Entry point. Dual storage (workspace + global), scope routing, Settings Sync for global notes, commands: `openPanel`, `newPage`, `deletePage`, `exportPage`, `switchToGlobal/Workspace`, `toggleBold/Italic/Strikethrough`.
+- `src/extension.ts` — Entry point. Dual storage (workspace + global), scope routing, Settings Sync for global notes, commands: `openPanel`, `newPage`, `deletePage`, `exportPage`, `switchToGlobal/Workspace`, `toggleBold/Italic/Strikethrough/Code/Highlight/Heading`. Formatting commands post a `{type: 'command', command}` message to the active webview — keybindings live in `package.json` (`when: mdpad.focused`) so they work uniformly as `Cmd/Ctrl+letter` on macOS and Windows/Linux.
 - `src/SidebarProvider.ts` — `WebviewViewProvider` for the Explorer sidebar. Accepts storage getter for scope switching.
 - `src/PanelProvider.ts` — Singleton `WebviewPanel` for floating editor. Exclusive mode: only sidebar or panel active at a time. Accepts storage getter for scope switching.
 - `src/NotesStorage.ts` — CRUD over any `vscode.Memento` (workspaceState or globalState). Cached reads. Stores `{ pages: Page[], activeId }`.
@@ -49,7 +49,7 @@ Two webpack bundles from one config file:
 
 **Webview** (`dist/webview.js`, target: web):
 - `src/webview/index.ts` — Entry point. Mounts editor, wires toolbar, handles postMessage.
-- `src/webview/editor.ts` — CodeMirror 6 with GFM, VS Code theme, keyboard shortcuts, list indent/outdent, paste-as-link, auto-close fences. Uses a `codeMirrorSettings` Compartment for live setting reconfiguration (font, line height, heading scale, line numbers, line wrapping, folding).
+- `src/webview/editor.ts` — CodeMirror 6 with GFM, VS Code theme, list indent/outdent (`Tab`/`Shift-Tab`), ordered-list continuation on `Enter`, paste-as-link, auto-close fences. Uses a `codeMirrorSettings` Compartment for live setting reconfiguration (font, line height, heading scale, line numbers, line wrapping, folding). Formatting shortcuts (bold/italic/strike/code/highlight/heading) are NOT in the CodeMirror keymap — they are handled by the extension host via `package.json` keybindings and the `MdpadCommand` message protocol; `src/webview/index.ts` applies them with `wrapSelection` / `toggleHeading`.
 - `src/webview/decorations.ts` — Muted-syntax ViewPlugin. Mark/line decorations only (no Decoration.replace). Click handlers for checkboxes and links. Regex-based passes for `==highlight==` and frontmatter.
 - `src/webview/editor.ts` contains section folding: `foldService` for H2/H3/frontmatter fold ranges, `foldGutter` (with line numbers), inline `FoldWidget` (without line numbers).
 - `src/webview/codeLanguages.ts` — Eagerly loaded language grammars for syntax highlighting in fenced code blocks.

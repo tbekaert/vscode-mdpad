@@ -1,107 +1,111 @@
 import { expect, test } from '@playwright/test'
-import { focusEditor, getEditorContent, initEditor } from './utils'
+import { focusEditor, getEditorContent, initEditor, sendMessage } from './utils'
 
-test.describe('shortcuts — wrapping', () => {
-  test('Ctrl+B wraps selection with **', async ({ page }) => {
+// Formatting shortcuts are routed through the VS Code extension host via
+// package.json keybindings. These tests exercise the webview's end of that
+// protocol: dispatching a `command` message and asserting the resulting doc.
+
+test.describe('command protocol — wrapping', () => {
+  test('toggleBold wraps selection with **', async ({ page }) => {
     await initEditor(page, 'hello')
     await focusEditor(page)
     await page.keyboard.press('Control+a')
-    await page.keyboard.press('Control+b')
-    const content = await page.locator('.cm-content').textContent()
-    expect(content).toContain('**hello**')
+    await sendMessage(page, { type: 'command', command: 'toggleBold' })
+    expect(await getEditorContent(page)).toBe('**hello**')
   })
 
-  test('Ctrl+I wraps selection with *', async ({ page }) => {
+  test('toggleItalic wraps selection with *', async ({ page }) => {
     await initEditor(page, 'hello')
     await focusEditor(page)
     await page.keyboard.press('Control+a')
-    await page.keyboard.press('Control+i')
-    const content = await page.locator('.cm-content').textContent()
-    expect(content).toContain('*hello*')
+    await sendMessage(page, { type: 'command', command: 'toggleItalic' })
+    expect(await getEditorContent(page)).toBe('*hello*')
   })
 
-  test('Ctrl+Shift+X wraps selection with ~~', async ({ page }) => {
+  test('toggleStrikethrough wraps selection with ~~', async ({ page }) => {
     await initEditor(page, 'hello')
     await focusEditor(page)
     await page.keyboard.press('Control+a')
-    await page.keyboard.press('Control+Shift+x')
-    const content = await page.locator('.cm-content').textContent()
-    expect(content).toContain('~~hello~~')
+    await sendMessage(page, {
+      type: 'command',
+      command: 'toggleStrikethrough',
+    })
+    expect(await getEditorContent(page)).toBe('~~hello~~')
   })
 
-  test('Ctrl+Shift+` wraps selection with backticks', async ({ page }) => {
+  test('toggleCode wraps selection with backticks', async ({ page }) => {
     await initEditor(page, 'hello')
     await focusEditor(page)
     await page.keyboard.press('Control+a')
-    await page.keyboard.press('Control+Shift+`')
-    const content = await page.locator('.cm-content').textContent()
-    expect(content).toContain('`hello`')
+    await sendMessage(page, { type: 'command', command: 'toggleCode' })
+    expect(await getEditorContent(page)).toBe('`hello`')
   })
 
-  test('Ctrl+Shift+E wraps selection with ==', async ({ page }) => {
+  test('toggleHighlight wraps selection with ==', async ({ page }) => {
     await initEditor(page, 'hello')
     await focusEditor(page)
     await page.keyboard.press('Control+a')
-    await page.keyboard.press('Control+Shift+e')
-    const content = await page.locator('.cm-content').textContent()
-    expect(content).toContain('==hello==')
+    await sendMessage(page, { type: 'command', command: 'toggleHighlight' })
+    expect(await getEditorContent(page)).toBe('==hello==')
   })
 
-  test('Ctrl+B with no selection inserts empty markers', async ({ page }) => {
+  test('toggleBold with no selection inserts empty markers', async ({
+    page,
+  }) => {
     await initEditor(page, 'hello')
     await focusEditor(page)
     await page.keyboard.press('End')
-    await page.keyboard.press('Control+b')
+    await sendMessage(page, { type: 'command', command: 'toggleBold' })
     expect(await getEditorContent(page)).toBe('hello****')
   })
 })
 
-test.describe('shortcuts — unwrapping', () => {
-  test('Ctrl+B unwraps already-bold selection', async ({ page }) => {
+test.describe('command protocol — unwrapping', () => {
+  test('toggleBold unwraps already-bold selection', async ({ page }) => {
     await initEditor(page, '**hello**')
     await focusEditor(page)
     await page.keyboard.press('Control+a')
-    await page.keyboard.press('Control+b')
+    await sendMessage(page, { type: 'command', command: 'toggleBold' })
     expect(await getEditorContent(page)).toBe('hello')
   })
 
-  test('Ctrl+I unwraps italic when cursor is inside', async ({ page }) => {
+  test('toggleItalic unwraps italic when cursor is inside', async ({
+    page,
+  }) => {
     await initEditor(page, '*hello*')
     await focusEditor(page)
     await page.keyboard.press('Control+Home')
     for (let i = 0; i < 3; i++) await page.keyboard.press('ArrowRight')
-    await page.keyboard.press('Control+i')
+    await sendMessage(page, { type: 'command', command: 'toggleItalic' })
     expect(await getEditorContent(page)).toBe('hello')
   })
 })
 
-test.describe('shortcuts — headings', () => {
-  test('Ctrl+Shift+H cycles heading level', async ({ page }) => {
+test.describe('command protocol — headings', () => {
+  test('toggleHeading cycles heading level', async ({ page }) => {
     await initEditor(page, 'hello')
     await focusEditor(page)
-    await page.keyboard.press('Control+Shift+h')
-    const content1 = await page.locator('.cm-content').textContent()
-    expect(content1).toContain('# hello')
+    await sendMessage(page, { type: 'command', command: 'toggleHeading' })
+    expect(await getEditorContent(page)).toBe('# hello')
 
-    await page.keyboard.press('Control+Shift+h')
-    const content2 = await page.locator('.cm-content').textContent()
-    expect(content2).toContain('## hello')
+    await sendMessage(page, { type: 'command', command: 'toggleHeading' })
+    expect(await getEditorContent(page)).toBe('## hello')
   })
 
-  test('Ctrl+Shift+H cycles H1 → H2 → H3 → plain', async ({ page }) => {
+  test('toggleHeading cycles H1 → H2 → H3 → plain', async ({ page }) => {
     await initEditor(page, 'text')
     await focusEditor(page)
 
-    await page.keyboard.press('Control+Shift+h')
+    await sendMessage(page, { type: 'command', command: 'toggleHeading' })
     expect(await getEditorContent(page)).toBe('# text')
 
-    await page.keyboard.press('Control+Shift+h')
+    await sendMessage(page, { type: 'command', command: 'toggleHeading' })
     expect(await getEditorContent(page)).toBe('## text')
 
-    await page.keyboard.press('Control+Shift+h')
+    await sendMessage(page, { type: 'command', command: 'toggleHeading' })
     expect(await getEditorContent(page)).toBe('### text')
 
-    await page.keyboard.press('Control+Shift+h')
+    await sendMessage(page, { type: 'command', command: 'toggleHeading' })
     expect(await getEditorContent(page)).toBe('text')
   })
 })

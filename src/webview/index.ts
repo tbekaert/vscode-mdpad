@@ -1,5 +1,10 @@
 import './styles.css'
-import { createEditor, type EditorHandle, wrapSelection } from './editor'
+import {
+  createEditor,
+  type EditorHandle,
+  toggleHeading,
+  wrapSelection,
+} from './editor'
 import type { ExtensionMessage } from './types'
 
 declare function acquireVsCodeApi(): {
@@ -65,6 +70,15 @@ const init = (): void => {
               break
             case 'toggleStrikethrough':
               wrapSelection(editor.view, '~~')
+              break
+            case 'toggleCode':
+              wrapSelection(editor.view, '`')
+              break
+            case 'toggleHighlight':
+              wrapSelection(editor.view, '==')
+              break
+            case 'toggleHeading':
+              toggleHeading(editor.view)
               break
           }
           break
