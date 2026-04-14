@@ -27,9 +27,21 @@ Notes default to workspace scope — tied to the current project. Click the scop
 
 Markdown characters (`#`, `**`, `*`, `` ` ``, `~~`, `==`) stay visible but dimmed. Content is styled live — headings are large, bold is bold, code is monospace, highlights are highlighted.
 
+### Frontmatter
+
+Type `---` at the top of a note to create a YAML frontmatter block. Keys are muted, values stay readable. The closing `---` is auto-inserted.
+
+Use `title:` to set a custom page title that overrides the auto-derived one:
+
+```yaml
+---
+title: My Custom Title
+---
+```
+
 ### Multiple pages
 
-Create, switch, and delete note pages from the toolbar dropdown. Page titles are derived automatically from the first heading or first line of content.
+Create, switch, and delete note pages from the toolbar dropdown. Page titles are derived from the frontmatter `title:` field, or the first heading, or the first line of content.
 
 ### Lists
 
