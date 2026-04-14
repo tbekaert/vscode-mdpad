@@ -37,15 +37,16 @@ Your markdown notepad inside VS Code.
 
 | Shortcut | Action |
 | -------- | ------ |
-| \`Ctrl+B\` | Bold |
-| \`Ctrl+I\` | Italic |
-| \`Ctrl+Shift+X\` | Strikethrough |
-| \`Ctrl+Shift+\`\` | Inline code |
-| \`Ctrl+Shift+E\` | Highlight |
-| \`Ctrl+Shift+H\` | Cycle heading |
+| \`Cmd/Ctrl+B\` | Bold |
+| \`Cmd/Ctrl+I\` | Italic |
+| \`Cmd/Ctrl+D\` | Strikethrough |
+| \`Cmd/Ctrl+K\` | Inline code |
+| \`Cmd/Ctrl+E\` | Highlight |
+| \`Cmd/Ctrl+H\` | Cycle heading |
 | \`Cmd/Ctrl+F\` | Find in note |
 | \`Cmd/Ctrl+Shift+F\` | Search all pages |
 | \`Tab\` / \`Shift+Tab\` | Indent / outdent list |
+| \`Alt+↑\` / \`Alt+↓\` | Move line up / down |
 
 - Globe icon: switch to Global notes
 - Overflow menu: Export, Settings

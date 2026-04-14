@@ -376,6 +376,24 @@ export const activate = (context: vscode.ExtensionContext): void => {
   )
 
   context.subscriptions.push(
+    vscode.commands.registerCommand('mdpad.toggleCode', () =>
+      postCommandToActive('toggleCode'),
+    ),
+  )
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('mdpad.toggleHighlight', () =>
+      postCommandToActive('toggleHighlight'),
+    ),
+  )
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('mdpad.toggleHeading', () =>
+      postCommandToActive('toggleHeading'),
+    ),
+  )
+
+  context.subscriptions.push(
     vscode.commands.registerCommand('mdpad.find', () => {
       const state = getActiveStorage().getState()
       const page = state.pages.find(p => p.id === state.activeId)

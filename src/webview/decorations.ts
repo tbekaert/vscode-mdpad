@@ -396,6 +396,10 @@ const buildDecorations = (view: EditorView): DecorationSet => {
       match !== null;
       match = highlightPattern.exec(line.text)
     ) {
+      // Skip empty matches (`====`) — a zero-width mark range is invalid and
+      // CodeMirror will throw. This happens while typing, e.g. after Cmd+E on
+      // an empty selection inserts `====` with the cursor in the middle.
+      if (match[1].length === 0) continue
       const start = line.from + match.index
       const end = start + match[0].length
       decorations.push(muted.range(start, start + 2))
