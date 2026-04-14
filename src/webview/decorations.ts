@@ -304,6 +304,8 @@ const buildDecorations = (view: EditorView): DecorationSet => {
     }
   }
 
+  const listItemLines = new Set<number>()
+
   tree.iterate({
     enter(node) {
       const { from, to, name } = node
@@ -339,6 +341,7 @@ const buildDecorations = (view: EditorView): DecorationSet => {
       }
       if (name === 'ListItem') {
         decorateListItem(decorations, doc, from)
+        listItemLines.add(doc.lineAt(from).number)
         return
       }
       if (name === 'HorizontalRule') {
@@ -355,6 +358,14 @@ const buildDecorations = (view: EditorView): DecorationSet => {
       }
     },
   })
+
+  // Fallback: decorate list markers on lines the parser missed (deeply nested)
+  for (let i = 1; i <= doc.lines; i++) {
+    if (listItemLines.has(i)) continue
+    const line = doc.line(i)
+    if (frontmatterEnd >= 0 && line.from < frontmatterEnd) continue
+    decorateListItem(decorations, doc, line.from)
+  }
 
   // Frontmatter --- block at top of document
   if (doc.lines >= 3) {
