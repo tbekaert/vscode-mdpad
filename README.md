@@ -2,8 +2,11 @@
 
 # mdpad
 
-[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/tbekaert.mdpad?label=VS%20Code%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=tbekaert.mdpad)
+[![VS Code Marketplace](https://vsmarketplacebadges.dev/version-short/tbekaert.mdpad.svg?label=VS%20Code%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=tbekaert.mdpad)
 [![Open VSX](https://img.shields.io/open-vsx/v/tbekaert/mdpad?label=Open%20VSX)](https://open-vsx.org/extension/tbekaert/mdpad)
+[![Installs](https://vsmarketplacebadges.dev/installs-short/tbekaert.mdpad.svg?label=Installs)](https://marketplace.visualstudio.com/items?itemName=tbekaert.mdpad)
+[![CI](https://github.com/tbekaert/vscode-mdpad/actions/workflows/ci.yml/badge.svg)](https://github.com/tbekaert/vscode-mdpad/actions/workflows/ci.yml)
+[![License: GPL v3+](https://img.shields.io/github/license/tbekaert/vscode-mdpad)](https://www.gnu.org/licenses/gpl-3.0)
 
 A lightweight markdown notepad inside VS Code. Type markdown and see it styled live — syntax stays visible but dimmed, content is formatted as you write.
 
