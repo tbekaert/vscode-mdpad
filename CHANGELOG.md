@@ -1,5 +1,15 @@
 # mdpad
 
+## 0.3.0
+
+### Minor Changes
+
+- 2dc84a5: Add keyboard shortcuts for page management (scoped to `when: mdpad.focused`):
+  new page (`Cmd/Ctrl+N`), previous page (`Cmd/Ctrl+Shift+[`), next page
+  (`Cmd/Ctrl+Shift+]`), and delete page (`Cmd/Ctrl+W`). The delete confirmation
+  dialog now names the page being deleted and explains that the action is
+  permanent.
+
 ## 0.2.0
 
 ### Minor Changes
