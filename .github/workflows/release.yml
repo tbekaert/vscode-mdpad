@@ -104,3 +104,66 @@ jobs:
           registryUrl: https://marketplace.visualstudio.com
           extensionFile: ${{ needs.package.outputs.vsix }}
           skipDuplicate: true
+
+  publish-github-release:
+    needs: package
+    if: needs.package.outputs.bumped == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: vsix
+
+      - name: Resolve version and vsix path
+        id: meta
+        run: |
+          VERSION=$(jq -r .version package.json)
+          VSIX=$(ls mdpad-*.vsix)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "vsix=$VSIX" >> "$GITHUB_OUTPUT"
+
+      - name: Skip if release already exists
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: |
+          if gh release view "v$VERSION" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Extract release notes from CHANGELOG.md
+        if: steps.check.outputs.exists == 'false'
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: |
+          awk -v ver="$VERSION" '
+            $0 == "## " ver { found=1; next }
+            found && /^## / { exit }
+            found { print }
+          ' CHANGELOG.md > RELEASE_NOTES.md
+          if [ ! -s RELEASE_NOTES.md ]; then
+            echo "See [CHANGELOG.md](./CHANGELOG.md) for details." > RELEASE_NOTES.md
+          fi
+
+      - name: Create GitHub release
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.meta.outputs.version }}
+          VSIX: ${{ steps.meta.outputs.vsix }}
+        run: |
+          PRERELEASE_FLAG=""
+          if [[ "$VERSION" == *-* ]]; then
+            PRERELEASE_FLAG="--prerelease"
+          fi
+          gh release create "v$VERSION" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "v$VERSION" \
+            --notes-file RELEASE_NOTES.md \
+            $PRERELEASE_FLAG \
+            "$VSIX"
