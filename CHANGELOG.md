@@ -1,5 +1,11 @@
 # mdpad
 
+## 0.3.1
+
+### Patch Changes
+
+- 577443d: Fix `mdpad.focused` context key staying active when the sidebar was visible but not focused. Shortcuts like `Cmd+F` now correctly trigger VS Code's find in the text editor instead of mdpad's, without needing to close the sidebar first.
+
 ## 0.3.0
 
 ### Minor Changes
