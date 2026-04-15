@@ -33,15 +33,20 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     )
 
     webviewView.webview.onDidReceiveMessage((message: WebviewMessage) => {
-      handleWebviewMessage(message, this.getStorage(), () => this.sendInit())
+      handleWebviewMessage(
+        message,
+        this.getStorage(),
+        () => this.sendInit(),
+        focused => {
+          vscode.commands.executeCommand('setContext', 'mdpad.focused', focused)
+        },
+      )
     })
 
     webviewView.onDidChangeVisibility(() => {
-      vscode.commands.executeCommand(
-        'setContext',
-        'mdpad.focused',
-        webviewView.visible,
-      )
+      if (!webviewView.visible) {
+        vscode.commands.executeCommand('setContext', 'mdpad.focused', false)
+      }
     })
 
     vscode.commands.executeCommand('setContext', 'mdpad.focused', true)

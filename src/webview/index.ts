@@ -103,6 +103,11 @@ const init = (): void => {
 
   window.addEventListener('focus', () => {
     editor?.view.focus()
+    vscode.postMessage({ type: 'focusChange', focused: true })
+  })
+
+  window.addEventListener('blur', () => {
+    vscode.postMessage({ type: 'focusChange', focused: false })
   })
 
   vscode.postMessage({ type: 'ready' })

@@ -13,6 +13,7 @@ export type WebviewMessage =
   | { type: 'ready' }
   | { type: 'updateContent'; content: string }
   | { type: 'openLink'; url: string }
+  | { type: 'focusChange'; focused: boolean }
 
 export type MdpadCommand =
   | 'toggleBold'

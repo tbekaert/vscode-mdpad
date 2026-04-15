@@ -6,6 +6,7 @@ export const handleWebviewMessage = (
   message: WebviewMessage,
   storage: NotesStorage,
   sendInit: () => void,
+  onFocusChange?: (focused: boolean) => void,
 ): void => {
   switch (message.type) {
     case 'ready':
@@ -16,6 +17,9 @@ export const handleWebviewMessage = (
       storage.updateContent(activeId, message.content)
       break
     }
+    case 'focusChange':
+      onFocusChange?.(message.focused)
+      break
     case 'openLink': {
       const url = message.url
       if (/^https?:\/\//.test(url)) {
