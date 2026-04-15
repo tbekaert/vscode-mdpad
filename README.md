@@ -91,6 +91,10 @@ Run the command **mdpad: Open as Panel** to detach mdpad from the sidebar and us
 | Heading cycle   | `Cmd/Ctrl+H`                   |
 | Find            | `Cmd/Ctrl+F`                   |
 | Search pages    | `Cmd/Ctrl+Shift+F`             |
+| New page        | `Cmd/Ctrl+N`                   |
+| Previous page   | `Cmd/Ctrl+Shift+[`             |
+| Next page       | `Cmd/Ctrl+Shift+]`             |
+| Delete page     | `Cmd/Ctrl+W`                   |
 | Indent list     | `Tab`                          |
 | Outdent list    | `Shift+Tab`                    |
 | Move line up    | `Alt+↑`                        |

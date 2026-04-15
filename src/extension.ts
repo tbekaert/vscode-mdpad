@@ -125,14 +125,20 @@ export const activate = (context: vscode.ExtensionContext): void => {
 
   context.subscriptions.push(
     vscode.commands.registerCommand('mdpad.deletePage', async () => {
+      const state = getActiveStorage().getState()
+      const page = state.pages.find(p => p.id === state.activeId)
+      const title = page ? deriveTitle(page.content) : 'Empty note'
       const confirmed = await vscode.window.showWarningMessage(
-        'Delete this page?',
-        { modal: true },
+        `Delete "${title}"?`,
+        {
+          modal: true,
+          detail:
+            'This page and its contents will be permanently removed. This action cannot be undone.',
+        },
         'Delete',
       )
       if (confirmed !== 'Delete') return
-      const { activeId } = getActiveStorage().getState()
-      getActiveStorage().deletePage(activeId)
+      getActiveStorage().deletePage(state.activeId)
       switchAndUpdate()
     }),
   )
