@@ -10,7 +10,9 @@ export const activate = (context: vscode.ExtensionContext): void => {
   const workspaceStorage = new NotesStorage(context.workspaceState)
   const globalStorage = new NotesStorage(context.globalState)
 
-  const savedScope = context.workspaceState.get<'workspace' | 'global'>('mdpad.scope')
+  const savedScope = context.workspaceState.get<'workspace' | 'global'>(
+    'mdpad.scope',
+  )
   let currentScope: 'workspace' | 'global' = savedScope ?? 'workspace'
 
   const getActiveStorage = (): NotesStorage =>
