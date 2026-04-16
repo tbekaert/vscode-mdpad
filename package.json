@@ -23,7 +23,8 @@
     "editor"
   ],
   "engines": {
-    "vscode": "^1.85.0"
+    "vscode": "^1.85.0",
+    "node": ">=24"
   },
   "extensionKind": [
     "ui",
@@ -375,7 +376,7 @@
     "@playwright/test": "^1.59.1",
     "@types/jsdom": "^28.0.1",
     "@types/mocha": "^10.0.0",
-    "@types/node": "^20.0.0",
+    "@types/node": "^24.0.0",
     "@types/vscode": "^1.85.0",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2",
