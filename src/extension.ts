@@ -10,20 +10,29 @@ export const activate = (context: vscode.ExtensionContext): void => {
   const workspaceStorage = new NotesStorage(context.workspaceState)
   const globalStorage = new NotesStorage(context.globalState)
 
-  let currentScope: 'workspace' | 'global' = 'workspace'
+  const savedScope = context.workspaceState.get<'workspace' | 'global'>('mdpad.scope')
+  let currentScope: 'workspace' | 'global' = savedScope ?? 'workspace'
 
   const getActiveStorage = (): NotesStorage =>
     currentScope === 'workspace' ? workspaceStorage : globalStorage
 
+  let mdpadFocused = false
+
+  const handleFocusChange = (focused: boolean) => {
+    mdpadFocused = focused
+  }
+
   const sidebarProvider = new SidebarProvider(
     context.extensionUri,
     getActiveStorage,
+    handleFocusChange,
   )
 
   const panelProvider = new PanelProvider(
     context.extensionUri,
     getActiveStorage,
     () => {},
+    handleFocusChange,
   )
 
   const syncEnabled = vscode.workspace
@@ -88,15 +97,15 @@ export const activate = (context: vscode.ExtensionContext): void => {
   }
 
   const switchAndUpdate = () => {
-    const title = `mdpad (${scopeLabel()})`
-    sidebarProvider.setTitle(title)
-    panelProvider.setTitle(title)
+    sidebarProvider.setTitle(scopeLabel())
+    panelProvider.setTitle(`mdpad (${scopeLabel()})`)
     sendInitToActive()
     updateStatusBar()
   }
 
   const setScope = (scope: 'workspace' | 'global'): void => {
     currentScope = scope
+    context.workspaceState.update('mdpad.scope', scope)
     vscode.commands.executeCommand('setContext', 'mdpad.scope', scope)
     switchAndUpdate()
   }
@@ -108,11 +117,27 @@ export const activate = (context: vscode.ExtensionContext): void => {
     ),
   )
 
+  sidebarProvider.setTitle(scopeLabel())
+
   context.subscriptions.push(
-    vscode.commands.registerCommand('mdpad.openPanel', () => {
+    vscode.commands.registerCommand('mdpad.openInEditor', () => {
       sidebarProvider.detach()
       panelProvider.open()
       panelProvider.setTitle(`mdpad (${scopeLabel()})`)
+    }),
+  )
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('mdpad.focusNotes', async () => {
+      if (mdpadFocused) {
+        await vscode.commands.executeCommand(
+          'workbench.action.focusActiveEditorGroup',
+        )
+      } else if (panelProvider.isActive) {
+        panelProvider.open()
+      } else {
+        await vscode.commands.executeCommand('mdpad.notesView.focus')
+      }
     }),
   )
 
@@ -205,6 +230,7 @@ export const activate = (context: vscode.ExtensionContext): void => {
       if (picked && 'pageId' in picked) {
         if (picked.scope !== currentScope) {
           currentScope = picked.scope as 'workspace' | 'global'
+          context.workspaceState.update('mdpad.scope', currentScope)
           vscode.commands.executeCommand(
             'setContext',
             'mdpad.scope',
@@ -344,6 +370,7 @@ export const activate = (context: vscode.ExtensionContext): void => {
         if (picked) {
           if (picked.scope !== currentScope) {
             currentScope = picked.scope
+            context.workspaceState.update('mdpad.scope', currentScope)
             vscode.commands.executeCommand(
               'setContext',
               'mdpad.scope',

@@ -38,8 +38,17 @@
   },
   "main": "./dist/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "mdpad",
+          "title": "mdpad",
+          "icon": "resources/icon.svg"
+        }
+      ]
+    },
     "views": {
-      "explorer": [
+      "mdpad": [
         {
           "type": "webview",
           "id": "mdpad.notesView",
@@ -49,10 +58,15 @@
     },
     "commands": [
       {
-        "command": "mdpad.openPanel",
-        "title": "Open as Panel",
+        "command": "mdpad.openInEditor",
+        "title": "Open in Editor",
         "category": "mdpad",
         "icon": "$(notebook)"
+      },
+      {
+        "command": "mdpad.focusNotes",
+        "title": "Focus Notes",
+        "category": "mdpad"
       },
       {
         "command": "mdpad.previousPage",
@@ -194,7 +208,7 @@
           "when": "view == mdpad.notesView"
         },
         {
-          "command": "mdpad.openPanel",
+          "command": "mdpad.openInEditor",
           "group": "2_mdpad@1",
           "when": "view == mdpad.notesView"
         },
@@ -286,7 +300,12 @@
         "command": "mdpad.deletePage",
         "key": "ctrl+w",
         "mac": "cmd+w",
-        "when": "mdpad.focused"
+        "when": "mdpad.focused && !mdpad.inEditor"
+      },
+      {
+        "command": "mdpad.focusNotes",
+        "key": "ctrl+alt+m",
+        "mac": "cmd+alt+m"
       }
     ],
     "configuration": {

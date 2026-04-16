@@ -15,7 +15,7 @@ A lightweight markdown notepad inside VS Code. Type markdown and see it styled l
 ## Quick Start
 
 1. Install mdpad from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=tbekaert.mdpad) or [Open VSX](https://open-vsx.org/extension/tbekaert/mdpad)
-2. Open the **Explorer sidebar** — mdpad appears as a view
+2. Click the **mdpad icon** in the activity bar (left side)
 3. Start typing markdown
 
 That's it. Your notes persist across restarts, per workspace. Toggle to **Global** scope for notes that follow you across all workspaces.
@@ -73,9 +73,19 @@ Create, switch, and delete note pages from the toolbar dropdown. Page titles are
 
 Run **mdpad: Export Current Page** to save the active note as a `.md` file.
 
-#### Floating panel
+#### Editor tab
 
-Run the command **mdpad: Open as Panel** to detach mdpad from the sidebar and use it as a standalone editor panel. Dock it anywhere in your VS Code layout.
+Run **mdpad: Open in Editor** from the command palette to open mdpad as a standalone editor tab. This detaches it from the sidebar view.
+
+#### Placing mdpad
+
+mdpad lives in its own activity bar icon by default. You can drag it to any location in VS Code:
+
+- **Explorer sidebar** — drag the mdpad view into the Explorer panel
+- **Secondary sidebar** — drag it to the right side panel for side-by-side with code
+- **Bottom panel** — drag it next to Terminal and Problems
+
+To move: right-click the mdpad view header and select **Move View To...**, or simply drag and drop.
 
 ### Interacting
 
@@ -95,6 +105,7 @@ Run the command **mdpad: Open as Panel** to detach mdpad from the sidebar and us
 | Previous page   | `Cmd/Ctrl+Shift+[`             |
 | Next page       | `Cmd/Ctrl+Shift+]`             |
 | Delete page     | `Cmd/Ctrl+W`                   |
+| Focus mdpad     | `Cmd/Ctrl+Alt+M`               |
 | Indent list     | `Tab`                          |
 | Outdent list    | `Shift+Tab`                    |
 | Move line up    | `Alt+↑`                        |
@@ -102,7 +113,7 @@ Run the command **mdpad: Open as Panel** to detach mdpad from the sidebar and us
 | Copy line up    | `Shift+Alt+↑`                  |
 | Copy line down  | `Shift+Alt+↓`                  |
 
-All formatting shortcuts are also available as `mdpad: …` commands in the VS Code command palette and can be rebound from **Keyboard Shortcuts** (they are scoped to `when: mdpad.focused`, so they only fire when the mdpad editor has focus).
+All formatting and page shortcuts are scoped to `when: mdpad.focused` so they only fire when the mdpad editor has focus. The **Focus mdpad** shortcut (`Cmd/Ctrl+Alt+M`) is global — press it to jump to mdpad from anywhere, or press again to return to your editor.
 
 #### Interactive elements
 
