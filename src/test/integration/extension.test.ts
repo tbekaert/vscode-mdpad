@@ -10,7 +10,7 @@ suite('Extension', () => {
   })
 
   const expectedCommands = [
-    'mdpad.openPanel',
+    'mdpad.openInEditor',
     'mdpad.newPage',
     'mdpad.deletePage',
     'mdpad.previousPage',
@@ -28,6 +28,7 @@ suite('Extension', () => {
     'mdpad.toggleCode',
     'mdpad.toggleHighlight',
     'mdpad.toggleHeading',
+    'mdpad.focusNotes',
   ]
 
   for (const cmd of expectedCommands) {

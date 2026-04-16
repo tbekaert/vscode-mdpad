@@ -16,6 +16,7 @@ export class PanelProvider {
     private readonly extensionUri: vscode.Uri,
     private readonly getStorage: () => NotesStorage,
     private readonly onDidDispose: () => void,
+    private readonly onFocusChange?: (focused: boolean) => void,
   ) {}
 
   open(): void {
@@ -52,6 +53,7 @@ export class PanelProvider {
         'mdpad.focused',
         e.webviewPanel.active,
       )
+      this.onFocusChange?.(e.webviewPanel.active)
     })
 
     this.panel.onDidDispose(() => {
@@ -59,10 +61,14 @@ export class PanelProvider {
       viewStateDisposable.dispose()
       this.panel = undefined
       vscode.commands.executeCommand('setContext', 'mdpad.focused', false)
+      vscode.commands.executeCommand('setContext', 'mdpad.inEditor', false)
+      this.onFocusChange?.(false)
       this.onDidDispose()
     })
 
     vscode.commands.executeCommand('setContext', 'mdpad.focused', true)
+    vscode.commands.executeCommand('setContext', 'mdpad.inEditor', true)
+    this.onFocusChange?.(true)
   }
 
   sendInit(): void {

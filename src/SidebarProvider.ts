@@ -13,10 +13,12 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   public static readonly viewId = 'mdpad.notesView'
 
   private view?: vscode.WebviewView
+  private pendingTitle?: string
 
   constructor(
     private readonly extensionUri: vscode.Uri,
     private readonly getStorage: () => NotesStorage,
+    private readonly onFocusChange?: (focused: boolean) => void,
   ) {}
 
   resolveWebviewView(webviewView: vscode.WebviewView): void {
@@ -39,6 +41,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         () => this.sendInit(),
         focused => {
           vscode.commands.executeCommand('setContext', 'mdpad.focused', focused)
+          this.onFocusChange?.(focused)
         },
       )
     })
@@ -46,10 +49,17 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     webviewView.onDidChangeVisibility(() => {
       if (!webviewView.visible) {
         vscode.commands.executeCommand('setContext', 'mdpad.focused', false)
+        this.onFocusChange?.(false)
       }
     })
 
+    if (this.pendingTitle) {
+      webviewView.title = this.pendingTitle
+      this.pendingTitle = undefined
+    }
+
     vscode.commands.executeCommand('setContext', 'mdpad.focused', true)
+    this.onFocusChange?.(true)
   }
 
   sendInit(): void {
@@ -66,6 +76,8 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   setTitle(title: string): void {
     if (this.view) {
       this.view.title = title
+    } else {
+      this.pendingTitle = title
     }
   }
 
