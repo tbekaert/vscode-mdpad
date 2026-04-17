@@ -1,5 +1,11 @@
 # mdpad
 
+## 0.4.1
+
+### Patch Changes
+
+- ba2fdce: Upgrade Node to 24, refresh GitHub Actions, and bump dev dependencies. No user-facing changes — tooling and CI only.
+
 ## 0.4.0
 
 ### Minor Changes
