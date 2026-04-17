@@ -4,7 +4,7 @@
   "description": "A lightweight markdown notepad inside VS Code",
   "version": "0.4.0",
   "publisher": "tbekaert",
-  "packageManager": "pnpm@10.29.2",
+  "packageManager": "pnpm@10.33.0",
   "license": "GPL-3.0-or-later",
   "icon": "images/icon.png",
   "repository": {
@@ -23,7 +23,8 @@
     "editor"
   ],
   "engines": {
-    "vscode": "^1.85.0"
+    "vscode": "^1.85.0",
+    "node": ">=24"
   },
   "extensionKind": [
     "ui",
@@ -370,25 +371,25 @@
   },
   "devDependencies": {
     "@bekaert-dev/biome-config": "^0.1.1",
-    "@biomejs/biome": "^2.4.11",
+    "@biomejs/biome": "^2.4.12",
     "@changesets/cli": "^2.30.0",
     "@playwright/test": "^1.59.1",
     "@types/jsdom": "^28.0.1",
     "@types/mocha": "^10.0.0",
-    "@types/node": "^20.0.0",
-    "@types/vscode": "^1.85.0",
+    "@types/node": "^24.0.0",
+    "@types/vscode": "^1.116.0",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2",
-    "@vscode/vsce": "^3.0.0",
+    "@vscode/vsce": "^3.9.0",
     "css-loader": "^7.0.0",
     "http-server": "^14.1.1",
     "jsdom": "^29.0.2",
-    "mocha": "^10.2.0",
+    "mocha": "^11.0.0",
     "style-loader": "^4.0.0",
     "ts-loader": "^9.5.0",
-    "typescript": "^5.7.0",
-    "webpack": "^5.90.0",
-    "webpack-cli": "^5.1.0"
+    "typescript": "^6.0.0",
+    "webpack": "^5.106.2",
+    "webpack-cli": "^7.0.0"
   },
   "dependencies": {
     "@codemirror/commands": "^6.8.0",
